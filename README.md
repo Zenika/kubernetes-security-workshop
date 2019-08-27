@@ -2,7 +2,7 @@
 
 Le but du workshop est d'apprendre comment sécuriser son cluster kubernetes par la pratique.
 
-Le workshop commencera d'abord par une présentation générale des différents concepts abordés avant de vous laissez avancer à votre rythme.
+Le workshop commencera d'abord par une présentation générale des différents concepts abordés avant de vous laisser avancer à votre rythme.
 
 Pour pouvoir continuer d'avancer même si une étape est problématique, nous vous fournissons les solutions de chacune des étapes.
 

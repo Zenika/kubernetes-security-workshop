@@ -4,7 +4,7 @@ Le but du workshop est d'apprendre comment sécuriser son cluster kubernetes par
 
 Le workshop commencera d'abord par une présentation générale des différents concepts abordés avant de vous laisser avancer à votre rythme.
 
-Pour pouvoir continuer d'avancer même si une étape est problématique, nous vous fournissons les solutions de chacune des étapes.
+Pour pouvoir continuer à avancer même si une étape est problématique, nous vous fournissons les solutions de chacune des étapes.
 
 ### 01 : Construire des images de conteneurs en application les bonnes pratiques de sécurité
  - https://res.cloudinary.com/snyk/image/upload/v1551798390/Docker_Image_Security_Best_Practices_.pdf

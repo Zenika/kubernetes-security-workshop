@@ -1,0 +1,18 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rails-app
+spec:
+  selector:
+    matchLabels:
+      app: rails-frontend
+  template:
+    metadata:
+      labels:
+        app: rails-frontend
+    spec:
+      containers:
+      - name: rails-frontend
+        image: ebriand/rails-frontend-without-cve
+        ports:
+        - containerPort: 3000

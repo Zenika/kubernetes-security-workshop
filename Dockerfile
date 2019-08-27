@@ -6,4 +6,6 @@ COPY demo demo
 WORKDIR demo
 RUN bundle install
 
+EXPOSE 3000
+
 ENTRYPOINT ["rails","s","--binding","0.0.0.0"]

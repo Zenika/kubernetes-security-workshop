@@ -27,15 +27,14 @@ curl localhost:3000/chybeta -H "Accept: ../../../../../../../../../../rails/.bas
 ```
 Step update rails
 ```
-docker image build -t rails-without-cve -f DockerfileWithoutCVE .
+Update rails in 5.2.2 in Gemfile and delete Gemfile.lock
+docker image build -t rails-without-cve -f DockerfileWithUser .
 docker container run -d --rm --name rails-without-cve -p 3000:3000 rails-without-cve
 curl localhost:3000/chybeta
 curl localhost:3000/chybeta -H "Accept: ../../../../../../../../../../rails/.bash_history{{"
 ```
 
- - https://res.cloudinary.com/snyk/image/upload/v1551798390/Docker_Image_Security_Best_Practices_.pdf
- - USER
- - Upgrade packages ?
+Cheatsheet : https://res.cloudinary.com/snyk/image/upload/v1551798390/Docker_Image_Security_Best_Practices_.pdf
 
 ### 02 : Cloisonner les composants d’un cluster
  - Quota / limit

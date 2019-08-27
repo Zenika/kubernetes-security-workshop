@@ -1,6 +1,6 @@
 # kubernetes-security-workshop
 
-Le but du workshop d'apprendre comment sécuriser son cluster kubernetes par la pratique.
+Le but du workshop est d'apprendre comment sécuriser son cluster kubernetes par la pratique.
 
 Le workshop commencera d'abord par une présentation générale des différents concepts abordés avant de vous laissez avancer à votre rythme.
 

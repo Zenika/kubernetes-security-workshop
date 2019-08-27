@@ -6,7 +6,7 @@ Le workshop commencera d'abord par une présentation générale des différents 
 
 Pour pouvoir continuer à avancer même si une étape est problématique, nous vous fournissons les solutions de chacune des étapes.
 
-### 01 : Construire des images de conteneurs en application les bonnes pratiques de sécurité
+### 01 : Construire des images de conteneurs en appliquant les bonnes pratiques de sécurité
  - https://res.cloudinary.com/snyk/image/upload/v1551798390/Docker_Image_Security_Best_Practices_.pdf
  - USER
  - Upgrade packages ?

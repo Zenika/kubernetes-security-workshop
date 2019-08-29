@@ -2,7 +2,7 @@
 
 source .env
 
-if [[ $# -lt 2 ]]; then
+if [[ $# -lt 1 ]]; then
   echo "Usage: ./create-project.sh <PROJECT_NAME>"
   exit 1
 fi
@@ -14,16 +14,16 @@ gcloud projects create $PROJECT \
 gcloud alpha billing projects link $PROJECT \
   --billing-account ${BILLING_ACCOUNT}
 
-gcloud projects add-iam-policy-binding $PROJECT \    
-  --member pierre-yves.aillet@zenika.com \
+gcloud projects add-iam-policy-binding $PROJECT \
+  --member user:pierre-yves.aillet@zenika.com \
   --role roles/owner
 
-gcloud projects add-iam-policy-binding $PROJECT \    
-  --member eric.briand@zenika.com \
+gcloud projects add-iam-policy-binding $PROJECT \
+  --member user:eric.briand@zenika.com \
   --role roles/owner
 
-gcloud projects add-iam-policy-binding $PROJECT \    
-  --member serviceAccount:terraform@${PROJECT}.iam.gserviceaccount.com \
+gcloud projects add-iam-policy-binding $PROJECT \
+  --member serviceAccount:terraform@kubernetes-security-workshop.iam.gserviceaccount.com \
   --role roles/owner
 
 gcloud services enable compute.googleapis.com --project $PROJECT

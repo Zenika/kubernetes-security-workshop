@@ -77,7 +77,7 @@ USER rails
 ```
 Modifier l'instruction COPY pour refléter ce changement de droit (ref: https://docs.docker.com/engine/reference/builder/#copy)
 
-Pour rappel, pour créer un utilisateur sous debian, il faut executer la commande suivante : 
+Pour rappel, pour créer un utilisateur sous debian, il faut exécuter la commande suivante : 
 ```bash
 groupadd --gid 1000 rails && useradd --uid 1000 --gid rails --shell /bin/bash --create-home rails
 ```

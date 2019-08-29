@@ -1,2 +1,3 @@
 account.json
 .terraform
+.env

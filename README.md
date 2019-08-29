@@ -75,7 +75,7 @@ Rajouter l'instruction USER à l'image Docker (ref: https://docs.docker.com/engi
 ```Dockerfile
 USER rails
 ```
-Modifier l'instrution COPY pour refléter ce changement de droit (ref: https://docs.docker.com/engine/reference/builder/#copy)
+Modifier l'instruction COPY pour refléter ce changement de droit (ref: https://docs.docker.com/engine/reference/builder/#copy)
 
 Pour rappel, pour créer un utilisateur sous debian, il faut executer la commande suivante : 
 ```bash

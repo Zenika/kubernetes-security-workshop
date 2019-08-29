@@ -46,7 +46,7 @@ kubectl apply -f k8s
 
 #### Exploitation de la faille
 
-Une fois l'application démarée, vous pouvez la requêtée normalement pour obtenir le README du projet :
+Une fois l'application démarrée, vous pouvez la requêter normalement pour obtenir le README du projet :
 
 ```bash
 # Pour obtenir l'ip des noeuds

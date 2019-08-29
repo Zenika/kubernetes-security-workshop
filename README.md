@@ -71,7 +71,7 @@ Pour mitiger le problème, il y a deux étapes.
 
 La première étape consiste à changer l'utilisateur avec lequel s'exécute l'application pour limiter les accès fichiers possibles via l'application. 
 
-Rajouter l'instruction USER a l'image Docker (ref: https://docs.docker.com/engine/reference/builder/#user)
+Rajouter l'instruction USER à l'image Docker (ref: https://docs.docker.com/engine/reference/builder/#user)
 ```Dockerfile
 USER rails
 ```

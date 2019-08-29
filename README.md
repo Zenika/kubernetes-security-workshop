@@ -65,7 +65,7 @@ Vous pouvez retrouver une explication de la faille : https://chybeta.github.io/2
 
 Cette faille peut être exploitée aussi pour ouvrir un shell à distance dans le conteneur, un exemple d'exploit: https://github.com/mpgn/Rails-doubletap-RCE
 
-Pour mitiger le problème, il a deux étapes.
+Pour mitiger le problème, il y a deux étapes.
 
 #### Changement d'utilisateur
 

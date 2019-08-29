@@ -19,10 +19,19 @@ resource "google_project_iam_binding" "registry-user" {
   ]
 }
 
-
 data "google_compute_subnetwork" "default-subnet" {
   name   = "default"
   project = "${data.google_project.team-project.project_id}"
+}
+
+resource "tls_private_key" "generated_keypair" {
+  algorithm = "RSA"
+  rsa_bits  = "2048"
+}
+
+resource "local_file" "private_key" {
+  filename = "${path.module}/${var.team_name}-key.pem"
+  content  = "${tls_private_key.generated_keypair.private_key_pem}"
 }
 
 resource "google_compute_instance" "shell" {
@@ -52,6 +61,9 @@ resource "google_compute_instance" "shell" {
   }
 
   metadata_startup_script = "${file("${path.module}/shell-startup.sh")}"
+  metadata = {
+    sshKeys = "${var.ssh_user}:${tls_private_key.generated_keypair.public_key_openssh}"
+  }
 
   service_account {
     email = "${google_service_account.sa.email}"
@@ -59,6 +71,29 @@ resource "google_compute_instance" "shell" {
   }
 
   project = "${data.google_project.team-project.project_id}"
+  provisioner "file" {
+    source      = "${path.module}/${var.team_name}-key.pem"
+    destination = "/home/ubuntu/.ssh/id_rsa"
+
+    connection {
+        host = "${self.network_interface.0.access_config.0.nat_ip}"
+        type = "ssh"
+        user = "ubuntu"
+        private_key = "${tls_private_key.generated_keypair.private_key_pem}"
+    }
+  }
+
+  provisioner "remote-exec" {
+    inline = [
+      "chmod 400 /home/ubuntu/.ssh/id_rsa",
+    ]
+    connection {
+        host = "${self.network_interface.0.access_config.0.nat_ip}"
+        type = "ssh"
+        user = "ubuntu"
+        private_key = "${tls_private_key.generated_keypair.private_key_pem}"
+    }
+  }
 }
 
 resource "google_compute_instance" "controller" {
@@ -88,6 +123,9 @@ resource "google_compute_instance" "controller" {
   }
 
   metadata_startup_script = "${file("${path.module}/controller-startup.sh")}"
+  metadata = {
+    sshKeys = "${var.ssh_user}:${tls_private_key.generated_keypair.public_key_openssh}"
+  }
 
   service_account {
     email = "${google_service_account.sa.email}"
@@ -126,6 +164,9 @@ resource "google_compute_instance" "worker" {
   }
 
   metadata_startup_script = "${file("${path.module}/worker-startup.sh")}"
+  metadata = {
+    sshKeys = "${var.ssh_user}:${tls_private_key.generated_keypair.public_key_openssh}"
+  }
 
   service_account {
     email = "${google_service_account.sa.email}"

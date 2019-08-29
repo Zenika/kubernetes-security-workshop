@@ -27,7 +27,7 @@ La sécurité d'un cluster Kubernetes commence par la sécurité des application
 
 Nous vous fournissons déjà l'application bootstrapée, le Dockerfile et les descripteurs Kubernetes pour déployer l'application.
 
-Les commandes à lancées :
+Les commandes à lancer :
 
 Construction de l'image :
 ```bash

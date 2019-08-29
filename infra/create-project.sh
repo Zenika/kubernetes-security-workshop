@@ -1,7 +1,12 @@
 #!/bin/sh
 
 source .env
-PROJECT=${1:-ksw-team1}
+
+if [[ $# -lt 2 ]]; then
+  echo "Usage: ./create-project.sh <PROJECT_NAME>"
+  exit 1
+fi
+PROJECT=$1
 
 gcloud projects create $PROJECT \
   --folder ${FOLDER}

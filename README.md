@@ -21,7 +21,7 @@ ssh <user>@<host>
 
 ### Construire des images de conteneurs en appliquant les bonnes pratiques de sécurité
 
-La sécurité d'un cluster Kubernetes commence par la sécurité des applications. Nous allons illustrer comment sécuriser une application a une faille publiquement connue. L'exemple utilisé ici est une faille de rails publiée au début de 2019 (https://nvd.nist.gov/vuln/detail/CVE-2019-5418)
+La sécurité d'un cluster Kubernetes commence par la sécurité des applications. Nous allons illustrer comment sécuriser une application vulnérable à une faille publiquement connue. L'exemple utilisé ici est une faille de rails publiée au début de 2019 (https://nvd.nist.gov/vuln/detail/CVE-2019-5418)
 
 #### Construction et déploiement
 

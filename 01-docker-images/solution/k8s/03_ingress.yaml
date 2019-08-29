@@ -1,7 +1,9 @@
-apiVersion: networking.k8s.io/v1beta1
+apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
   name: rails-ingress
+  annotations:
+    traefik.frontend.rule.type: PathPrefixStrip
 spec:
   rules:
   - http:

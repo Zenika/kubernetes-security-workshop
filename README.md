@@ -96,7 +96,7 @@ Mais on peut toujours requêter d'autres fichiers :
 ```bash
 curl <node-external-ip>/rails/chybeta -H 'Accept: ../../../../../../../../../../demo/Gemfile{{'
 ```
-
+À noter que cette pratique permet de mitiger d'éventuelles autres failles qui n'auraient pas encore de correctifs.
 #### Mise à jour des dépendances
 
 La seconde étape va être de mettre à jour la version de rails qui contient le fix de la CVE. Mettre à jour le fichier Gemfile avec une version fixée de rails.

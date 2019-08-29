@@ -106,7 +106,7 @@ Construire, publier et redéployer l'image avec le tag :
 eu.gcr.io/<projet>/rails-without-cve:1
 ```
 
-Une fois la nouvelle version de l'application déployée, le curl précédent ne fonctionne plus pour récupérer `/etc/shadow` :
+Une fois la nouvelle version de l'application déployée, le curl précédent ne fonctionne plus pour récupérer des fichiers du conteneur indépendamment de leur propriétaire :
 ```bash
 curl <node-external-ip>/rails/chybeta -H 'Accept: ../../../../../../../../../../demo/Gemfile{{'
 ```

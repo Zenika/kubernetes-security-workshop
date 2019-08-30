@@ -9,3 +9,7 @@ variable "region" {
 variable "zone" {
     default = "europe-west1-c"
 }
+
+variable "ssh_user" {
+    default = "ubuntu"
+}

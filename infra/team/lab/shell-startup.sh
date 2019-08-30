@@ -1,6 +1,9 @@
 #!/bin/sh
 
 
+echo "StrictHostKeyChecking accept-new" >> /etc/ssh/ssh_config
+systemctl reload sshd
+
 apt-get update
 apt-get install -y docker.io unzip
 

@@ -21,7 +21,7 @@ sudo apt-add-repository ppa:ansible/ansible -y
 sudo apt update
 sudo apt install -y ansible
 
-echo "🏗 Installing ansible"
+echo "🏗 Installing kubespray"
 git clone https://github.com/kubernetes-sigs/kubespray.git
 
 cd kubespray

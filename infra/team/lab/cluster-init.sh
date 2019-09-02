@@ -36,3 +36,8 @@ CONFIG_FILE=inventory/mycluster/hosts.yml python3 contrib/inventory_builder/inve
 
 echo "☸ Deploying Kubernetes"
 ansible-playbook -i inventory/mycluster/hosts.yml cluster.yml -b -v   --private-key=~/.ssh/id_rsa
+
+ssh controller sudo cp /etc/kubernetes/admin.conf /home/ubuntu/kubeconfig
+    ssh controller sudo chown ubuntu:ubuntu /home/ubuntu/kubeconfig
+mkdir ~/.kube
+scp controller:~/kubeconfig ~/.kube/config

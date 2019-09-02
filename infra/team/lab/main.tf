@@ -94,6 +94,32 @@ resource "google_compute_instance" "shell" {
         private_key = "${tls_private_key.generated_keypair.private_key_pem}"
     }
   }
+
+  provisioner "file" {
+    source      = "${path.module}/cluster-init.sh"
+    destination = "/home/ubuntu/cluster-init.sh"
+
+    connection {
+        host = "${self.network_interface.0.access_config.0.nat_ip}"
+        type = "ssh"
+        user = "ubuntu"
+        private_key = "${tls_private_key.generated_keypair.private_key_pem}"
+    }
+  }  
+
+  provisioner "remote-exec" {
+    inline = [
+      "sudo cp /home/ubuntu/cluster-init.sh /usr/local/bin",
+      "sudo chmod 755 /usr/local/bin/cluster-init.sh",
+      "/usr/local/bin/cluster-init.sh",
+    ]
+    connection {
+        host = "${self.network_interface.0.access_config.0.nat_ip}"
+        type = "ssh"
+        user = "ubuntu"
+        private_key = "${tls_private_key.generated_keypair.private_key_pem}"
+    }
+  }  
 }
 
 resource "google_compute_instance" "controller" {

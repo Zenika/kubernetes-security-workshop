@@ -14,7 +14,7 @@ gcloud auth configure-docker --quiet
 
 echo "📦 Installing dependencies"
 sudo apt-get update
-sudo apt-get install -y python-pip python3-pip software-properties-common
+sudo apt-get install -y python3-pip python-pip software-properties-common
 
 echo "📦 Installing ansible"
 sudo apt-add-repository ppa:ansible/ansible -y
@@ -27,7 +27,7 @@ git clone https://github.com/kubernetes-sigs/kubespray.git
 cd kubespray
 
 pip3 install -r requirements.txt
-pip install -r requirements.txt
+pip install netaddr
 
 echo "🔧 Configuring kubespray"
 cp -r inventory/sample inventory/mycluster

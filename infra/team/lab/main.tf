@@ -67,13 +67,25 @@ resource "google_compute_instance" "shell" {
 
   service_account {
     email = "${google_service_account.sa.email}"
-    scopes = ["userinfo-email", "compute-rw", "storage-rw"]
+    scopes = ["userinfo-email", "compute-ro", "storage-rw"]
   }
 
   project = "${data.google_project.team-project.project_id}"
   provisioner "file" {
     source      = "${path.module}/${var.team_name}-key.pem"
     destination = "/home/ubuntu/.ssh/id_rsa"
+
+    connection {
+        host = "${self.network_interface.0.access_config.0.nat_ip}"
+        type = "ssh"
+        user = "ubuntu"
+        private_key = "${tls_private_key.generated_keypair.private_key_pem}"
+    }
+  }
+
+  provisioner "file" {
+    source      = "${path.module}/hosts.yml"
+    destination = "/home/ubuntu/hosts.yml"
 
     connection {
         host = "${self.network_interface.0.access_config.0.nat_ip}"
@@ -155,7 +167,7 @@ resource "google_compute_instance" "controller" {
 
   service_account {
     email = "${google_service_account.sa.email}"
-    scopes = ["userinfo-email", "compute-rw", "storage-rw"]
+    scopes = ["userinfo-email", "compute-ro", "storage-rw"]
   }
 
   project = "${data.google_project.team-project.project_id}"
@@ -196,7 +208,7 @@ resource "google_compute_instance" "worker" {
 
   service_account {
     email = "${google_service_account.sa.email}"
-    scopes = ["userinfo-email", "compute-rw", "storage-rw"]
+    scopes = ["userinfo-email", "compute-ro", "storage-rw"]
   }
 
   project = "${data.google_project.team-project.project_id}"

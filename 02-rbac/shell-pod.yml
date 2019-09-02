@@ -1,0 +1,12 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: shell-pod
+spec:
+  replicas: 1
+  template:
+    spec:
+      containers:
+      - name: shell
+        image: pyaillet/kubectl:v1.15.0
+        command: ["sh", "-c", "sleep infinity"]

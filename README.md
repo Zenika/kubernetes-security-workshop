@@ -156,14 +156,57 @@ tout nous allons supprimer cette application.
 
 - `kubectl delete deployment exhauster`
 
-Et relancer le noeud afin de le réparer :
+Et relancer le noeud afin de le réparer (il doit repasser en Ready) :
 
 - `gcloud compute instances reset worker-1`
 
-TODO: Ajouter la création les limits sur la création du Pod
-TODO: Ajouter la création de la LimitRange
-TODO: Ajouter la création des Quotas
+Avec Kubernetes, comme avec Docker, il est possible de définir des limites
+de ressources affectées aux conteneurs. Pour plus de renseignements sur ce 
+mécanisme, vous pouvez consulter la docupmentation officielle [ici](https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/).
 
+Néanmoins, ce mécanisme seule ne suffit pas. En effet il est toujours possible
+de créer des Pods sans déclarer les `limits` associées.
+Les objets `LimitRange` permettent de s'assurer que dans un Namespace donné,
+tous les objets créés définiront les limites de ressources tout en respectant
+des valeurs minimum et maximum.
+
+Créez une `LimitRange` afin de s'assurer que lorsqu'un Pod est créé il ne
+puisse pas prendre toutes les ressources disponibles.
+
+Recréez le Pod avec la commande ci-après, et vérifiez que cette fois ci il est
+supprimé lorsqu'il occupe trop de ressources.
+
+Malheureusement, même ainsi, il est toujours possible d'occuper toutes les
+ressources du cluster en augmentant le nombre d'instances du Pod qui tournent
+en même temps.
+Faites le test en lançant la commande (définissez une valeur suffisament élevée
+pour occuper toute la mémoire) :  
+`kubectl scale --replicas=10 deploy/exhauster`
+
+À nouveau, lancez `kubectl get nodes -w`
+
+Et attendez quelques minutes de voir :
+`node3   NotReady   <none>   15h   v1.15.3`
+
+Nous allons voir comment empêcher la création d'un trop grand nombre de Pods.
+Mais avant tout, nous allons supprimer cette application.
+
+- `kubectl delete deployment exhauster`
+
+Et relancer le noeud afin de le réparer (il doit repasser en Ready) :
+
+- `gcloud compute instances reset worker-1`
+
+En vous inspirant des exemples disponibles 
+[ici](https://kubernetes.io/docs/tasks/administer-cluster/manage-resources/quota-memory-cpu-namespace/),
+créez les Quotas afin d'empêcher que la multiplication des instances 
+d'`exhauster` n'occupent toutes les ressources.
+
+Tester votre solution en appliquant à nouveau le déploiement :
+`kubectl apply -f 02-partition/01-quota/malicious-deployment.yml`
+
+Et en multipliant le nombre d'instances désirées :
+`kubectl scale --replicas=10 deploy/exhauster`
 
 #### 02.02 : NetworkPolicy
 

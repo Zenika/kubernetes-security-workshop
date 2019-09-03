@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name:  exhauster
+  namespace: 
+  labels:
+    name:  exhauster
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name:  exhauster
+  template:
+    metadata:
+      labels:
+        name:  exhauster
+    spec: 
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: kubernetes.io/hostname
+                operator: In
+                values:
+                - node3
+      containers:
+      - image:  vish/stress
+        name:  exhauster
+        args: ["-mem-total", "3.5Gi", "-mem-alloc-size", "1Mi", "-mem-alloc-sleep", "10ms"]

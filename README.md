@@ -122,11 +122,54 @@ Nous n'avons illustré ici que les deux derniers points, la sécurisation du cod
 
 Vous pouvez retrouver d'autres pratiques pour améliorer la sécurité de vos images de conteneurs : https://res.cloudinary.com/snyk/image/upload/v1551798390/Docker_Image_Security_Best_Practices_.pdf
 
-### 02 : Bien exploiter le RBAC
-### 03 : Cloisonner les composants d’un cluster
- - Quota / limit
- - Network policies
- - Pod security policies
+### 02 : Cloisonner les composants d’un cluster
+
+Lorsqu'on utilise Kubernetes, les 
+[Namespaces](https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/#)
+permettent d'organiser et de partager les ressources disponibles sur un cluster
+kubernetes entre plusieurs équipes.
+Afin que cette cohabition se passe au mieux, l'API Kubernetes expose des
+ressources utilisées pour limiter et maîtriser ce que chaque équipe peut faire.
+
+#### 02.01 : Quotas / Limits
+
+Une première étape consiste à limiter les ressources qu'une équipe peut
+utiliser afin qu'une utilisation excessive de ressources par une équipe
+(malveillante ou accidentelle) ne nuise pas aux autres équipes.
+
+Un exemple est disponible à déployer sur votre cluster :
+`kubectl apply -f 02-partition/01-quota/malicious-deployment.yml`
+
+Ce déploiement va créer un Pod qui consommera toutes la mémoire du noeud
+`node3`.
+- Lancez `kubectl get nodes -w`
+
+Au bout de quelques minutes vous verrez :
+`node3   NotReady   <none>   15h   v1.15.3`
+
+L'ensemble de la mémoire disponible sur ce noeud a été consommé et il n'est
+plus disponible.
+
+Nous allons voir comment éviter ce type de comportement en définissant des
+limites de ressources disponibles pour les Pods et leurs Containers. Mais avant
+tout nous allons supprimer cette application.
+
+- `kubectl delete deployment exhauster`
+
+Et relancer le noeud afin de le réparer :
+
+- `gcloud compute instances reset worker-1`
+
+TODO: Ajouter la création les limits sur la création du Pod
+TODO: Ajouter la création de la LimitRange
+TODO: Ajouter la création des Quotas
+
+
+#### 02.02 : NetworkPolicy
+
+#### 02.03 : PodSecurityPolicy
+
+### 03 : Bien exploiter le RBAC
 
 ### 04 : détecter des comportements non souhaités au runtime 
  - Opa (policy, only signed images?)

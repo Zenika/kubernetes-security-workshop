@@ -9,6 +9,22 @@ resource "google_service_account" "sa" {
   project = "${data.google_project.team-project.project_id}"
 }
 
+resource "google_project_iam_custom_role" "instance-restarter" {
+  role_id     = "instanceRestarter"
+  title       = "Instance restarter"
+  project     = "${data.google_project.team-project.project_id}"
+  description = "A role allowing to restart GCE instances"
+  permissions = ["compute.instances.get", "compute.instances.start", "compute.instances.stop", "compute.instances.reset"]
+}
+
+resource "google_project_iam_binding" "restart-instance" {
+  project = "${data.google_project.team-project.project_id}"
+  role    = "projects/${data.google_project.team-project.project_id}/roles/${google_project_iam_custom_role.instance-restarter.role_id}"
+
+  members = [
+    "serviceAccount:${google_service_account.sa.email}"
+  ]
+}
 
 resource "google_project_iam_binding" "registry-user" {
   project = "${data.google_project.team-project.project_id}"
@@ -67,7 +83,7 @@ resource "google_compute_instance" "shell" {
 
   service_account {
     email = "${google_service_account.sa.email}"
-    scopes = ["userinfo-email", "compute-ro", "storage-rw"]
+    scopes = ["userinfo-email", "compute-rw", "storage-rw"]
   }
 
   project = "${data.google_project.team-project.project_id}"

@@ -122,11 +122,100 @@ Nous n'avons illustré ici que les deux derniers points, la sécurisation du cod
 
 Vous pouvez retrouver d'autres pratiques pour améliorer la sécurité de vos images de conteneurs : https://res.cloudinary.com/snyk/image/upload/v1551798390/Docker_Image_Security_Best_Practices_.pdf
 
-### 02 : Bien exploiter le RBAC
-### 03 : Cloisonner les composants d’un cluster
- - Quota / limit
- - Network policies
- - Pod security policies
+### 02 : Cloisonner les composants d’un cluster
+
+Lorsqu'on utilise Kubernetes, les 
+[Namespaces](https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/#)
+permettent d'organiser et de partager les ressources disponibles sur un cluster
+kubernetes entre plusieurs équipes.
+Afin que cette cohabition se passe au mieux, l'API Kubernetes expose des
+ressources utilisées pour limiter et maîtriser ce que chaque équipe peut faire.
+
+#### 02.01 : Quotas / Limits
+
+Une première étape consiste à limiter les ressources utilisables dans un
+Namespace. Cela permet de se prémunir d'une utilisation excessive de ressources
+dans ce Namespace sans nuire aux autres Namespaces dans le cas d'une
+manipulation accidentelle (application qui surconsomme des ressources en cas de
+problème) ou d'une attaque extérieure (récupération d'un token d'accès au
+cluster).
+
+Un exemple est disponible à déployer sur votre cluster :
+`kubectl apply -f 02-partition/01-quota/malicious-deployment.yml`
+
+Ce déploiement va créer un Pod qui consommera toutes la mémoire du noeud
+`node3`.
+- Lancez `kubectl get nodes -w`
+
+Au bout de quelques minutes vous verrez :
+`node3   NotReady   <none>   15h   v1.15.3`
+
+L'ensemble de la mémoire disponible sur ce noeud a été consommé et il n'est
+plus disponible.
+
+Nous allons voir comment éviter ce type de comportement en définissant des
+limites de ressources disponibles pour les Pods et leurs Containers. Mais avant
+tout nous allons supprimer cette application.
+
+- `kubectl delete deployment exhauster`
+
+Et relancer le noeud afin de le réparer (il doit repasser en Ready) :
+
+- `gcloud compute instances reset worker-1`
+
+Avec Kubernetes, comme avec Docker, il est possible de définir des limites
+de ressources affectées aux conteneurs. Pour plus de renseignements sur ce 
+mécanisme, vous pouvez consulter la docupmentation officielle [ici](https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/).
+
+Néanmoins, ce mécanisme seule ne suffit pas. En effet il est toujours possible
+de créer des Pods sans déclarer les `limits` associées.
+Les objets `LimitRange` permettent de s'assurer que dans un Namespace donné,
+tous les objets créés définiront les limites de ressources tout en respectant
+des valeurs minimum et maximum.
+
+Créez une `LimitRange` afin de s'assurer que lorsqu'un Pod est créé il ne
+puisse pas prendre toutes les ressources disponibles.
+
+Recréez le Pod avec la commande ci-après, et vérifiez que cette fois ci il est
+supprimé lorsqu'il occupe trop de ressources.
+
+Malheureusement, même ainsi, il est toujours possible d'occuper toutes les
+ressources du cluster en augmentant le nombre d'instances du Pod qui tournent
+en même temps.
+Faites le test en lançant la commande (définissez une valeur suffisament élevée
+pour occuper toute la mémoire) :  
+`kubectl scale --replicas=10 deploy/exhauster`
+
+À nouveau, lancez `kubectl get nodes -w`
+
+Et attendez quelques minutes de voir :
+`node3   NotReady   <none>   15h   v1.15.3`
+
+Nous allons voir comment empêcher la création d'un trop grand nombre de Pods.
+Mais avant tout, nous allons supprimer cette application.
+
+- `kubectl delete deployment exhauster`
+
+Et relancer le noeud afin de le réparer (il doit repasser en Ready) :
+
+- `gcloud compute instances reset worker-1`
+
+En vous inspirant des exemples disponibles 
+[ici](https://kubernetes.io/docs/tasks/administer-cluster/manage-resources/quota-memory-cpu-namespace/),
+créez les Quotas afin d'empêcher que la multiplication des instances 
+d'`exhauster` n'occupent toutes les ressources.
+
+Tester votre solution en appliquant à nouveau le déploiement :
+`kubectl apply -f 02-partition/01-quota/malicious-deployment.yml`
+
+Et en multipliant le nombre d'instances désirées :
+`kubectl scale --replicas=10 deploy/exhauster`
+
+#### 02.02 : NetworkPolicy
+
+#### 02.03 : PodSecurityPolicy
+
+### 03 : Bien exploiter le RBAC
 
 ### 04 : détecter des comportements non souhaités au runtime 
  - Opa (policy, only signed images?)

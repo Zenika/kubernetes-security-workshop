@@ -215,6 +215,20 @@ Et en multipliant le nombre d'instances désirées :
 
 #### 02.02 : NetworkPolicy
 
+Une seconde étape de cloisonnement est d'utiliser les NetworkPolicies. Elles vont permettre de d'autoriser et d'interdir les communications réseaux entrantres ou sortantes des pods.
+
+:warning: Les NetworkPolicies nécessite un network addon compatible :warning:
+
+Nous allons utiliser une application 3 tiers traditionnelle et déclarer les règles suivantes : 
+ - Le front peut communiquer avec le backend
+ - Le backend peut communiquer avec la base de données
+
+Déployer l'application:
+`kubectl apply -f 02-partition/02-network-policies/application.yaml`
+
+
+
+
 ### 03 : Bien exploiter le RBAC
 
 ### 04 : PodSecurityPolicy

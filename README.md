@@ -215,7 +215,9 @@ Et en multipliant le nombre d'instances désirées :
 
 #### 02.02 : NetworkPolicy
 
-#### 02.03 : PodSecurityPolicy
+### 03 : Bien exploiter le RBAC
+
+### 04 : PodSecurityPolicy
 
 Lors de la première étape, nous avons vu qu'il n'était pas souhaitable de
 laisser les utilisateurs lancer des conteneurs en tant qu'utilisateur `root`.
@@ -291,16 +293,17 @@ Ces plugins sont activables et désactivables au lancement de l'API Server
 Kubernetes.
 Malheureusement `PodSecurityPolicy` n'est pas activé par défaut et il va falloir
 l'activer avant de pouvoir l'utiliser pour sécuriser votre cluster.
-_Attention_ néanmoins, une fois que ce plugin est activé, il est nécessaire de
-définir une `PodSecurityPolicy` dans tous les Namespace dans lesquels des Pods
-devront être déployés.
+_Attention_ néanmoins, une fois que ce plugin est activé, il n'est plus
+possible de créer de Pod sans avoir défini les droits pour autoriser
+l'utilisation d'une `PodSecurityPolicy` validant la création du Pod.
 
-Commencez par déployer une `PodSecurityPolicy` permissive dans le Namespace
-`kube-system`. En effet, il s'agit de l'espace du cluster réservé au
-déploiement des conteneurs utilisés pour l'administration du cluter.
+Commencez par déployer une `PodSecurityPolicy` permissive et autoriser
+le service account par défaut du Namespace `kube-system` à l'utiliser.
+En effet, il s'agit de l'espace du cluster réservé au déploiement des
+conteneurs utilisés pour l'administration du cluter.
 
-- `kubectl apply -f 02-partition/03-psp/kube-system-psp.yaml`
-- `kubectl apply -f 02-partition/03-psp/default-psp.yaml`
+- `kubectl apply -f 04-psp/kube-system-psp.yaml`
+- `kubectl apply -f 04-psp/default-psp.yaml`
 
 Connectez-vous en ssh au serveur qui héberge le control-plane du cluster.
 
@@ -340,13 +343,9 @@ Une fois ces tests réalisés :
 - Supprimez le déploiement
 - Désactivez l'admission plugin `PodSecurityPolicy`
 
-### 03 : Bien exploiter le RBAC
-
-
-
-### 04 : détecter des comportements non souhaités au runtime 
+### 05 : détecter des comportements non souhaités au runtime 
  - Opa (policy, only signed images?)
  - Falco
 
-### 05 : Comprendre l’importance des mises à jours suite à une CVE
+### 06 : Comprendre l’importance des mises à jours suite à une CVE
  - Exploiter une cve fixée (maj cluster)

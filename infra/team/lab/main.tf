@@ -9,6 +9,22 @@ resource "google_service_account" "sa" {
   project = "${data.google_project.team-project.project_id}"
 }
 
+resource "google_project_iam_custom_role" "instance-restarter" {
+  role_id     = "instanceRestarter"
+  title       = "Instance restarter"
+  project     = "${data.google_project.team-project.project_id}"
+  description = "A role allowing to restart GCE instances"
+  permissions = ["compute.instances.get", "compute.instances.start", "compute.instances.stop", "compute.instances.reset"]
+}
+
+resource "google_project_iam_binding" "restart-instance" {
+  project = "${data.google_project.team-project.project_id}"
+  role    = "projects/${data.google_project.team-project.project_id}/roles/${google_project_iam_custom_role.instance-restarter.role_id}"
+
+  members = [
+    "serviceAccount:${google_service_account.sa.email}"
+  ]
+}
 
 resource "google_project_iam_binding" "registry-user" {
   project = "${data.google_project.team-project.project_id}"
@@ -47,10 +63,6 @@ resource "google_compute_instance" "shell" {
     }
   }
 
-  // Local SSD disk
-  scratch_disk {
-  }
-
   network_interface {
     subnetwork = "${data.google_compute_subnetwork.default-subnet.self_link}"
     network_ip = "10.132.0.20"
@@ -74,6 +86,18 @@ resource "google_compute_instance" "shell" {
   provisioner "file" {
     source      = "${path.module}/${var.team_name}-key.pem"
     destination = "/home/ubuntu/.ssh/id_rsa"
+
+    connection {
+        host = "${self.network_interface.0.access_config.0.nat_ip}"
+        type = "ssh"
+        user = "ubuntu"
+        private_key = "${tls_private_key.generated_keypair.private_key_pem}"
+    }
+  }
+
+  provisioner "file" {
+    source      = "${path.module}/hosts.yml"
+    destination = "/home/ubuntu/hosts.yml"
 
     connection {
         host = "${self.network_interface.0.access_config.0.nat_ip}"
@@ -131,12 +155,9 @@ resource "google_compute_instance" "controller" {
 
   boot_disk {
     initialize_params {
+      size  = "30"
       image = "ubuntu-os-cloud/ubuntu-1804-lts"
     }
-  }
-
-  // Local SSD disk
-  scratch_disk {
   }
 
   network_interface {
@@ -155,7 +176,7 @@ resource "google_compute_instance" "controller" {
 
   service_account {
     email = "${google_service_account.sa.email}"
-    scopes = ["userinfo-email", "compute-rw", "storage-rw"]
+    scopes = ["userinfo-email", "compute-ro", "storage-rw"]
   }
 
   project = "${data.google_project.team-project.project_id}"
@@ -172,12 +193,9 @@ resource "google_compute_instance" "worker" {
 
   boot_disk {
     initialize_params {
+      size  = "30"
       image = "ubuntu-os-cloud/ubuntu-1804-lts"
     }
-  }
-
-  // Local SSD disk
-  scratch_disk {
   }
 
   network_interface {
@@ -196,7 +214,7 @@ resource "google_compute_instance" "worker" {
 
   service_account {
     email = "${google_service_account.sa.email}"
-    scopes = ["userinfo-email", "compute-rw", "storage-rw"]
+    scopes = ["userinfo-email", "compute-ro", "storage-rw"]
   }
 
   project = "${data.google_project.team-project.project_id}"

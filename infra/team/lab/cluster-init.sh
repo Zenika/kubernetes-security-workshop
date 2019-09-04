@@ -30,14 +30,14 @@ pip3 install -r requirements.txt
 pip install netaddr
 
 echo "🔧 Configuring kubespray"
-cp -r inventory/sample inventory/mycluster
-declare -a IPS=(10.132.0.21 10.132.0.22 10.132.0.23)
-CONFIG_FILE=inventory/mycluster/hosts.yml python3 contrib/inventory_builder/inventory.py ${IPS[@]}
+cp -r inventory/sample inventory/cluster
+cp ~/hosts.yml inventory/cluster/hosts.yml
 
 echo "☸ Deploying Kubernetes"
-ansible-playbook -i inventory/mycluster/hosts.yml cluster.yml -b -v   --private-key=~/.ssh/id_rsa
+ansible-playbook -i inventory/cluster/hosts.yml cluster.yml -b -v   --private-key=~/.ssh/id_rsa
 
 ssh controller sudo cp /etc/kubernetes/admin.conf /home/ubuntu/kubeconfig
-    ssh controller sudo chown ubuntu:ubuntu /home/ubuntu/kubeconfig
+ssh controller sudo chown ubuntu:ubuntu /home/ubuntu/kubeconfig
 mkdir ~/.kube
 scp controller:~/kubeconfig ~/.kube/config
+

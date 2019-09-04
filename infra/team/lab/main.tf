@@ -63,10 +63,6 @@ resource "google_compute_instance" "shell" {
     }
   }
 
-  // Local SSD disk
-  scratch_disk {
-  }
-
   network_interface {
     subnetwork = "${data.google_compute_subnetwork.default-subnet.self_link}"
     network_ip = "10.132.0.20"
@@ -159,12 +155,9 @@ resource "google_compute_instance" "controller" {
 
   boot_disk {
     initialize_params {
+      size  = "30"
       image = "ubuntu-os-cloud/ubuntu-1804-lts"
     }
-  }
-
-  // Local SSD disk
-  scratch_disk {
   }
 
   network_interface {
@@ -200,12 +193,9 @@ resource "google_compute_instance" "worker" {
 
   boot_disk {
     initialize_params {
+      size  = "30"
       image = "ubuntu-os-cloud/ubuntu-1804-lts"
     }
-  }
-
-  // Local SSD disk
-  scratch_disk {
   }
 
   network_interface {

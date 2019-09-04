@@ -111,6 +111,8 @@ Une fois la nouvelle version de l'application déployée, le curl précédent ne
 curl <node-external-ip>/rails/chybeta -H 'Accept: ../../../../../../../../../../demo/Gemfile{{'
 ```
 
+Une fois le test effectué supprimer le déploiement.
+
 #### Conclusion
 
 La sécurité se joue a plusieurs niveaux pour une application :
@@ -213,13 +215,137 @@ Et en multipliant le nombre d'instances désirées :
 
 #### 02.02 : NetworkPolicy
 
-#### 02.03 : PodSecurityPolicy
-
 ### 03 : Bien exploiter le RBAC
 
-### 04 : détecter des comportements non souhaités au runtime 
+### 04 : PodSecurityPolicy
+
+Lors de la première étape, nous avons vu qu'il n'était pas souhaitable de
+laisser les utilisateurs lancer des conteneurs en tant qu'utilisateur `root`.
+
+Il est possible, et nécessaire de sensibiliser les équipes à ce sujet, mais il
+est également possible d'activer un mécanisme de Kubernetes permettant de
+s'assurer que les conteneurs ne fonctionnent pas avec l'utilisateur `root`
+ainsi que d'autres contraintes de sécurité.
+
+Un premier mécanisme, nommé 
+[SecurityContext](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/)
+permet d'ajouter des informations aux Pods et Deployment afin, notamment, de
+préciser l'utilisateur avec lequel le conteneur s'exécutera et autres
+contraintes.
+
+Exemple de Pod avec un `SecurityContext` :
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: security-context-demo-2
+spec:
+  containers:
+  - name: sec-ctx-demo-2
+    image: gcr.io/google-samples/node-hello:1.0
+    securityContext:
+      runAsUser: 2000
+      allowPrivilegeEscalation: false
+```
+
+Le second mécanisme s'appuie sur un plugin de Kubernetes qui va valider et
+autoriser ou interdire les requêtes de création des Pods :
+
+- Un [Admission Controller](https://kubernetes.io/docs/reference/access-authn-authz/admission-controllers/).
+
+![Admission controller phases](images/admission-controller-phases.png)
+
+L'admission plugin est nommé comme la ressource qu'il exploite : 
+[PodSecurityPolicy](https://kubernetes.io/docs/concepts/policy/pod-security-policy/)
+
+Vous trouverez ci-dessous un example de `PodSecurityPolicy` qui interdit :
+- D'exécuter des conteneurs en mode privilégié
+- De monter des répertoire de l'hôte dans les conteneurs
+
+```yaml
+apiVersion: policy/v1beta1
+kind: PodSecurityPolicy
+metadata:
+  name: example
+spec:
+  privileged: false  # Don't allow privileged pods!
+  seLinux:
+    rule: RunAsAny
+  supplementalGroups:
+    rule: RunAsAny
+  runAsUser:
+    rule: RunAsAny
+  fsGroup:
+    rule: RunAsAny
+  volumes:
+    - 'configMap'
+    - 'emptyDir'
+    - 'projected'
+    - 'secret'
+    - 'downwardAPI'
+    - 'persistentVolumeClaim'
+    # Don't allow to mount hostPath volume types and expose host dirs in 
+    # containers
+    # - 'hostPath' 
+```
+
+Ces plugins sont activables et désactivables au lancement de l'API Server
+Kubernetes.
+Malheureusement `PodSecurityPolicy` n'est pas activé par défaut et il va falloir
+l'activer avant de pouvoir l'utiliser pour sécuriser votre cluster.
+_Attention_ néanmoins, une fois que ce plugin est activé, il n'est plus
+possible de créer de Pod sans avoir défini les droits pour autoriser
+l'utilisation d'une `PodSecurityPolicy` validant la création du Pod.
+
+Commencez par déployer une `PodSecurityPolicy` permissive et autoriser
+le service account par défaut du Namespace `kube-system` à l'utiliser.
+En effet, il s'agit de l'espace du cluster réservé au déploiement des
+conteneurs utilisés pour l'administration du cluter.
+
+- `kubectl apply -f 04-psp/kube-system-psp.yaml`
+- `kubectl apply -f 04-psp/default-psp.yaml`
+
+Connectez-vous en ssh au serveur qui héberge le control-plane du cluster.
+
+- `ssh controller`
+
+En tant qu'utilisateur `root`, éditez le fichier 
+`/etc/kubernetes/manifests/kube-apiserver.yaml`
+
+Remplacer la ligne
+`- --enable-admission-plugins=NodeRestriction`
+En
+`- --enable-admission-plugins=NodeRestriction,PodSecurityPolicy`
+
+Sauvegardez le fichier
+
+L'API Server doit se relancer et cela peut nécessiter quelques minutes.
+En attendant vous pouvez avoir un message du type :
+```bash
+ubuntu@shell:~$ kubectl get pods
+The connection to the server 10.132.0.21:6443 was refused - did you specify the right host or port?
+```
+
+Une fois l'API Server redémarré, essayer de re-déployer la version vulnérable
+de la première application.
+Vous devriez constater qu'aucun Pod n'est créé.
+Essayons de savoir pourquoi avec la commande suivante :
+`kubectl describe replicaset`
+
+Vous devriez voir un message du type :
+`Warning  Failed     2m27s (x8 over 3m50s)  kubelet, node2     Error: container has runAsNonRoot and image will run as root`
+
+En vous aidant de la documentation, modifiez le déploiement pour y ajouter un
+SecurityContext à la définition des Pods afin que les conteneurs fonctionnent
+avec un autre utilisateur que `root` et puissent être créés et démarrés. 
+
+Une fois ces tests réalisés :
+- Supprimez le déploiement
+- Désactivez l'admission plugin `PodSecurityPolicy`
+
+### 05 : détecter des comportements non souhaités au runtime 
  - Opa (policy, only signed images?)
  - Falco
 
-### 05 : Comprendre l’importance des mises à jours suite à une CVE
+### 06 : Comprendre l’importance des mises à jours suite à une CVE
  - Exploiter une cve fixée (maj cluster)

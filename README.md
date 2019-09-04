@@ -133,9 +133,12 @@ ressources utilisées pour limiter et maîtriser ce que chaque équipe peut fair
 
 #### 02.01 : Quotas / Limits
 
-Une première étape consiste à limiter les ressources qu'une équipe peut
-utiliser afin qu'une utilisation excessive de ressources par une équipe
-(malveillante ou accidentelle) ne nuise pas aux autres équipes.
+Une première étape consiste à limiter les ressources utilisables dans un
+Namespace. Cela permet de se prémunir d'une utilisation excessive de ressources
+dans ce Namespace sans nuire aux autres Namespaces dans le cas d'une
+manipulation accidentelle (application qui surconsomme des ressources en cas de
+problème) ou d'une attaque extérieure (récupération d'un token d'accès au
+cluster).
 
 Un exemple est disponible à déployer sur votre cluster :
 `kubectl apply -f 02-partition/01-quota/malicious-deployment.yml`

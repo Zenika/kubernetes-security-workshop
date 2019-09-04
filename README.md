@@ -217,6 +217,68 @@ Et en multipliant le nombre d'instances désirées :
 
 ### 03 : Bien exploiter le RBAC
 
+Lors des interactions avec un cluster Kubernetes, toutes les requêtes sont
+authentifiées :
+- les requêtes effectuées depuis votre poste utilisent un compte associé à un certificat
+  vous pouvez le consulter à l'aide de la commande suivante :
+  `grep client-certificate-data .kube/config | awk '{ print $2 }' | base64 -d | openssl x509 -in - -noout -text | grep "Subject:"`
+- les requêtes effectuées dans le cluster sont réalisées par des 
+  [ServiceAccount](https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/)
+  Pour en savoir plus sur les ServiceAccount vous pouvez également consulter 
+  [cette page](https://kubernetes.io/docs/reference/access-authn-authz/service-accounts-admin/)
+
+Afin de s'assurer qu'une requête est autorisée sur le cluster, Kubernetes 
+utilise le principe de Role-Based Access Control (RBAC).
+
+Un rôle donne des droits sur les ressources de l'API (lecture, modification, ...).
+
+L'action est autorisé si au moins un rôle donne les droits nécessaires à
+l'utilisateur sur la ressource concernée.
+
+Exemple de rôle permettant de consulter les `Namespace`:
+```yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  # "namespace" omitted since ClusterRoles are not namespaced
+  name: namespace-reader
+rules:
+- apiGroups: [""]
+  resources: ["namespace"]
+  verbs: ["get", "watch", "list"]
+```
+
+Exemple d'affectation du rôle à un utilisateur:
+```yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: read-namespace
+subjects:
+- kind: User
+  name: "alice@example.com"
+  apiGroup: rbac.authorization.k8s.io
+roleRef:
+  kind: ClusterRole
+  name: namespace-reader
+  apiGroup: rbac.authorization.k8s.io
+```
+
+Certaines ressources sont transverses au cluster, elles sont :
+- gérées via les `ClusterRole`
+- attribuées via les `ClusterRoleBinding`
+
+Certaines ressources sont cloisonnées par Namespace, elles sont :
+- gérées via les `Role`
+- attribuées via les `RoleBinding` ou les `ClusterRoleBinding`
+
+Trouvez comment le rôle `cluster-admin` est associé aux requêtes effectuées via
+`kubectl` depuis la machine `shell`
+
+TODO: Ajouter la description du montage des SA
+TODO: Ajouter l'énoncé du TP - création d'un Pod dans le ns rbac et création
+      des role/rolebinding nécessaires pour l'utiliser et lister les pods du ns
+
 ### 04 : PodSecurityPolicy
 
 Lors de la première étape, nous avons vu qu'il n'était pas souhaitable de

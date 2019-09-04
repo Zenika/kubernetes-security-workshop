@@ -148,7 +148,7 @@ resource "google_compute_instance" "shell" {
 
 resource "google_compute_instance" "controller" {
   name         = "controller"
-  machine_type = "n1-standard-1"
+  machine_type = "n1-standard-2"
   zone         = "${var.zone}"
 
   tags = ["${var.team_name}", "controller"]

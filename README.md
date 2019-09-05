@@ -226,6 +226,37 @@ Nous allons utiliser une application 3 tiers traditionnelle et déclarer les rè
 Déployer l'application:
 `kubectl apply -f 02-partition/02-network-policies/application.yaml`
 
+Sans NetworkPolicies, tout pod peut communiquer avec un autre:
+```
+kubectl get pods -n app 
+kubectl exec -it <anypod> bash
+curl frontend
+curl backend
+(printf "PING\r\n";) | nc redis 6379
+````
+
+Appliquons une première NetworkPolicy pour limiter l'accès à la base de données:
+```yaml
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  namespace: app
+  name: backend-redis-only-rule
+spec:
+  podSelector:
+    matchLabels:
+      app: redis
+  ingress:
+  - from:
+    - podSelector:
+        matchLabels:
+          app: backend
+```
+
+Essayez de nouveau de faire le ping vers redis depuis le frontend, celui-ci ne devrait plus fonctionner.
+Créez les NetworkPolicies suivantes:
+ - Autoriser la communication depuis le pod frontend vers le pod backend
+ - Refuser la communication depuis le pod frontend vers internet
 
 
 

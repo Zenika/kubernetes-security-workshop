@@ -5,7 +5,7 @@ WORKDIR /go/frontend
 COPY . .
 RUN CGO_ENABLED=0 go build -o frontend .
 
-FROM gcr.io/distroless/base
+FROM debian:10 
 COPY --from=0 /go/frontend/frontend /frontend
 COPY index.html index.html
 EXPOSE 80

@@ -117,7 +117,7 @@ spec:
     spec:
       containers:
       - name: redis
-        image: redis 
+        image: eu.gcr.io/kubernetes-security-workshop/redis:5
         ports:
         - containerPort: 6379
 ---

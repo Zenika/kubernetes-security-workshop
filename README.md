@@ -241,7 +241,7 @@ kind: NetworkPolicy
 apiVersion: networking.k8s.io/v1
 metadata:
   namespace: app
-  name: backend-redis-only-rule
+  name: backend-redis-only-policy
 spec:
   podSelector:
     matchLabels:
@@ -255,10 +255,24 @@ spec:
 
 Essayez de nouveau de faire le ping vers redis depuis le frontend, celui-ci ne devrait plus fonctionner.
 Créez les NetworkPolicies suivantes:
- - Autoriser la communication depuis le pod frontend vers le pod backend
+ - Autoriser la communication vers le pod backend seulement depuis le pod frontend
+ - Refuser toute communication vers le pods frontend
  - Refuser la communication depuis le pod frontend vers internet
 
+Pour vous aidez : 
+ - La documentation des NetworkPolicies : https://kubernetes.io/docs/concepts/services-networking/network-policies/
+ - Des exemples de NetworkPolicies : https://github.com/ahmetb/kubernetes-network-policy-recipes
 
+Pour tester que les NetworkPolicies sont correctes:
+ - Dans le pod redis : `curl frontend`
+ - Dans le pod frontend : `(printf "PING\r\n";) | nc redis 6379`
+ - Dans le pod frontend : curl google.fr
+
+Grâce aux NetworkPolicies, vous pouvez donc :
+ - Maitriser les flux entre vos applications pour vous prémunir d'erreur éventuelles
+ - Limiter l'impact d'une intrusion en limitant les appels réseaux possibles
+
+Pour aller plus loin, vous pouvez regarder le network addon Cilium qui permet d'avoir des CiliumNetworkPolicies qui vont vous permettre de limiter des accès de manière plus fines comme par exemple définir à quelle ressource REST un pod peut accèder. Plus d'information : https://cilium.io/blog/2018/09/19/kubernetes-network-policies/
 
 ### 03 : Bien exploiter le RBAC
 

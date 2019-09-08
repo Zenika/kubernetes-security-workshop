@@ -1,4 +1,9 @@
 
+provider "google" {
+  credentials = "${file("account.json")}"
+  region      = "europe-west1"
+}
+
 data "google_project" "team-project" {
   project_id = "ksw-${var.team_name}"
 }

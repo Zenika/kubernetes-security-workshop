@@ -219,6 +219,7 @@ Et en multipliant le nombre d'instances désirées :
 
 Lors des interactions avec un cluster Kubernetes, toutes les requêtes sont
 authentifiées :
+
 - les requêtes effectuées depuis votre poste utilisent un compte associé à un certificat
   vous pouvez le consulter à l'aide de la commande suivante :
   `grep client-certificate-data .kube/config | awk '{ print $2 }' | base64 -d | openssl x509 -in - -noout -text | grep "Subject:"`
@@ -236,6 +237,7 @@ L'action est autorisé si au moins un rôle donne les droits nécessaires à
 l'utilisateur sur la ressource concernée.
 
 Exemple de rôle permettant de consulter les `Namespace`:
+
 ```yaml
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
@@ -265,19 +267,56 @@ roleRef:
 ```
 
 Certaines ressources sont transverses au cluster, elles sont :
+
 - gérées via les `ClusterRole`
 - attribuées via les `ClusterRoleBinding`
 
 Certaines ressources sont cloisonnées par Namespace, elles sont :
+
 - gérées via les `Role`
 - attribuées via les `RoleBinding` ou les `ClusterRoleBinding`
 
 Trouvez comment le rôle `cluster-admin` est associé aux requêtes effectuées via
 `kubectl` depuis la machine `shell`
 
-TODO: Ajouter la description du montage des SA
-TODO: Ajouter l'énoncé du TP - création d'un Pod dans le ns rbac et création
-      des role/rolebinding nécessaires pour l'utiliser et lister les pods du ns
+Afin de simplifier les interactions avec l'API Server du cluster Kubernetes,
+par défaut un ServiceAccount est créé pour chaque Namespace.
+Les informations permettant de se connecter à l'API Server
+(token, cacert, ...) sont montés par défaut pour tous les Pods dans le
+répertoire : `/var/run/secrets/kubernetes.io/serviceaccount`
+
+Certains composants déployés sur Kubernetes ont besoin d'autorisations
+particulières pour fonctionner et utilisent ces Service Account associés à des
+droit particuliers :
+
+- Les IngressControllers ont besoin d'avoir accès aux ressources de type
+  Ingress
+  (voir [Traefik RBAC Configuration](https://docs.traefik.io/user-guide/kubernetes/#role-based-access-control-configuration-kubernetes-16-only)).
+- Helm utilise un ServiceAccount dédié à Tiller qui a des droits étendus afin
+  de pouvoir déployer sur le cluster
+  (voir [Tiller RBAC Configuration](https://github.com/helm/helm/blob/master/docs/rbac.md#role-based-access-control))
+- ...
+
+Il est nécessaire d'être particulièrement vigilant avec les droits associés aux
+Service Account, car leur utilisation peut donner un accès étendu au Cluster.
+
+Pour expérimenter ces configurations, déployez les fichiers présents dans le
+répertoire `initial`.
+
+Deux Pods seront créés `shell-pod` et `podreader`.
+
+Ces deux Pods utilisent le Service Account `default` du Namespace `default` et
+par défaut nous avons donné les droits à ces Pods de lister tous les Pods du
+cluster.
+L'objectif est de faire en sorte que seul le Pod `podreader` ait les droits
+pour afficher les Pod du cluster.
+
+- Créez un descripteur pour un Service Account `rbac` dans le Namespace du même
+  nom. Aidez vous de
+  [cette documentation](https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/#use-multiple-service-accounts)
+- Modifiez les descripteurs pour faire en sorte que le Pod `podreader` utilise
+  ce ServiceAccount et ait les droits de lister les Pods du cluster alors que
+  `shell-pod` ne les ait plus.
 
 ### 04 : PodSecurityPolicy
 

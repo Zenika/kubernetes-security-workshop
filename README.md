@@ -217,7 +217,7 @@ Et en multipliant le nombre d'instances désirées :
 
 Une seconde étape de cloisonnement est d'utiliser les NetworkPolicies. Elles vont permettre d'autoriser ou d'interdire les communications réseaux entrantes ou sortantes des pods.
 
-:warning: Les NetworkPolicies nécessite un network addon compatible :warning:
+:warning: Les NetworkPolicies nécessitent un network addon compatible :warning:
 
 Nous allons utiliser une application 3 tiers traditionnelle et déclarer les règles suivantes : 
  - Le front peut communiquer avec le backend

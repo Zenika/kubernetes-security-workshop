@@ -41,3 +41,4 @@ ssh controller sudo chown ubuntu:ubuntu /home/ubuntu/kubeconfig
 mkdir ~/.kube
 scp controller:~/kubeconfig ~/.kube/config
 
+echo "source <(kubectl completion bash)" >> ~/.bashrc

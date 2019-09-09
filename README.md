@@ -226,7 +226,7 @@ Nous allons utiliser une application 3 tiers traditionnelle et déclarer les rè
 Déployer l'application:
 `kubectl apply -f 02-partition/02-network-policies/application.yaml`
 
-Sans NetworkPolicies, tout pod peut communiquer avec un autre:
+Sans NetworkPolicies, tout Pod peut communiquer avec un autre:
 ```
 kubectl get pods -n app 
 kubectl exec -it <anypod> bash

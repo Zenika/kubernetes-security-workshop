@@ -544,8 +544,11 @@ Dans les parties précédentes, nous avons vu comment configurer un cluster pour
 Mais comment détecter un comportement lorsque le cluster fonctionne ? Nous allons utiliser un outils de détection d'intrusion et de comportement anormal.
 [Falco](https://falco.org/) est un outils de la CNCF qui permet de faire cela.
 
-Pour installer
+Pour installer:
 
+```bash
+helm install --name falco stable/falco
+```
 
 ### 06 : Comprendre l’importance des mises à jours suite à une CVE
 

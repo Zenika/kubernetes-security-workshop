@@ -33,14 +33,24 @@ echo "🔧 Configuring kubespray"
 cp -r inventory/sample inventory/cluster
 cp ~/hosts.yml inventory/cluster/hosts.yml
 cp ~/k8s-cluster.yml inventory/cluster/group_vars/k8s-cluster/k8s-cluster.yml
+cp ~/addons.yml inventory/cluster/group_vars/k8s-cluster/addons.yml
 cp ~/all.yml inventory/cluster/group_vars/all/all.yml
 
 echo "☸ Deploying Kubernetes"
-ansible-playbook -i inventory/cluster/hosts.yml cluster.yml -b -v --tags=helm --private-key=~/.ssh/id_rsa
+ansible-playbook -i inventory/cluster/hosts.yml cluster.yml -b -v --private-key=~/.ssh/id_rsa
 
 sudo cp ~/kubespray/inventory/cluster/artifacts/kubectl /usr/local/bin
+
 mkdir ~/.kube
 sudo cp ~/kubespray/inventory/cluster/artifacts/admin.conf ~/.kube/config
 sudo chown ubuntu:ubuntu ~/.kube/config
 
 echo "source <(kubectl completion bash)" >> ~/.bashrc
+
+echo "Installing helm"
+wget https://get.helm.sh/helm-v2.13.1-linux-amd64.tar.gz
+tar -zxvf helm-v2.13.1-linux-amd64.tar.gz
+sudo mv linux-amd64/helm /usr/local/bin/helm
+rm -f helm-v2.13.1-linux-amd64.tar.gz linux-amd64
+helm init --client-only
+

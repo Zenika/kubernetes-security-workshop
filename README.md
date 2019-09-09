@@ -227,7 +227,7 @@ Déployer l'application:
 `kubectl apply -f 02-partition/02-network-policies/application.yaml`
 
 Sans NetworkPolicies, tout Pod peut communiquer avec un autre:
-```
+```bash
 kubectl get pods -n app 
 kubectl exec -it <anypod> bash
 curl frontend

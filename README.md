@@ -215,7 +215,7 @@ Et en multipliant le nombre d'instances désirées :
 
 #### 02.02 : NetworkPolicy
 
-Une seconde étape de cloisonnement est d'utiliser les NetworkPolicies. Elles vont permettre de d'autoriser et d'interdir les communications réseaux entrantres ou sortantes des pods.
+Une seconde étape de cloisonnement est d'utiliser les NetworkPolicies. Elles vont permettre d'autoriser ou d'interdire les communications réseaux entrantes ou sortantes des pods.
 
 :warning: Les NetworkPolicies nécessite un network addon compatible :warning:
 

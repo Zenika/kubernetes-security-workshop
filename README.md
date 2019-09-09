@@ -264,15 +264,15 @@ Pour vous aidez :
  - Des exemples de NetworkPolicies : https://github.com/ahmetb/kubernetes-network-policy-recipes
 
 Pour tester que les NetworkPolicies sont correctes:
- - Dans le pod redis : `curl frontend`
- - Dans le pod frontend : `(printf "PING\r\n";) | nc redis 6379`
- - Dans le pod frontend : curl google.fr
+ - Dans le Pod redis : `curl frontend`
+ - Dans le Pod frontend : `(printf "PING\r\n";) | nc redis 6379`
+ - Dans le Pod frontend : `curl google.fr`
 
 Grâce aux NetworkPolicies, vous pouvez donc :
- - Maitriser les flux entre vos applications pour vous prémunir d'erreur éventuelles
+ - Maitriser les flux entre vos applications pour vous prémunir d'erreurs éventuelles
  - Limiter l'impact d'une intrusion en limitant les appels réseaux possibles
 
-Pour aller plus loin, vous pouvez regarder le network addon Cilium qui permet d'avoir des CiliumNetworkPolicies qui vont vous permettre de limiter des accès de manière plus fines comme par exemple définir à quelle ressource REST un pod peut accèder. Plus d'information : https://cilium.io/blog/2018/09/19/kubernetes-network-policies/
+Pour aller plus loin, vous pouvez regarder le network addon Cilium qui permet d'avoir des CiliumNetworkPolicies qui vont vous permettre de limiter des accès de manière plus fines comme par exemple définir à quelle ressource REST un Pod peut accéder. Plus d'informations : https://cilium.io/blog/2018/09/19/kubernetes-network-policies/
 
 ### 03 : Bien exploiter le RBAC
 

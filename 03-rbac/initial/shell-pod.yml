@@ -7,5 +7,5 @@ metadata:
 spec:
   containers:
   - name: shell
-    image: eu.gcr.io/kubernetes-security-workshop/kubectl:v1.15.0
+    image: eu.gcr.io/kubernetes-security-workshop/kubectl:v1.12.2
     command: ["sh", "-c", "sleep infinity"]

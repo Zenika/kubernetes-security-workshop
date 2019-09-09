@@ -1,6 +1,6 @@
 FROM ubuntu:18.04
 
-ENV KUBECTL_VERSION="v1.15.0"
+ENV KUBECTL_VERSION="v1.12.2"
 
 RUN apt update && \
   apt install -y curl && \

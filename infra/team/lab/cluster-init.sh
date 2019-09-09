@@ -22,7 +22,7 @@ sudo apt update
 sudo apt install -y ansible
 
 echo "🏗 Installing kubespray"
-git clone https://github.com/kubernetes-sigs/kubespray.git
+git clone --branch v2.9.0 https://github.com/kubernetes-sigs/kubespray.git
 
 cd kubespray
 
@@ -32,13 +32,15 @@ pip install netaddr
 echo "🔧 Configuring kubespray"
 cp -r inventory/sample inventory/cluster
 cp ~/hosts.yml inventory/cluster/hosts.yml
+cp ~/k8s-cluster.yml inventory/cluster/group_vars/k8s-cluster/k8s-cluster.yml
+cp ~/all.yml inventory/cluster/group_vars/all/all.yml
 
 echo "☸ Deploying Kubernetes"
 ansible-playbook -i inventory/cluster/hosts.yml cluster.yml -b -v   --private-key=~/.ssh/id_rsa
 
-ssh controller sudo cp /etc/kubernetes/admin.conf /home/ubuntu/kubeconfig
-ssh controller sudo chown ubuntu:ubuntu /home/ubuntu/kubeconfig
+sudo cp ~/kubespray/inventory/cluster/artifacts/kubectl /usr/local/bin
 mkdir ~/.kube
-scp controller:~/kubeconfig ~/.kube/config
+sudo cp ~/kubespray/inventory/cluster/artifacts/admin.conf ~/.kube/config
+sudo chown ubuntu:ubuntu ~/.kube/config
 
 echo "source <(kubectl completion bash)" >> ~/.bashrc

@@ -107,6 +107,29 @@ resource "google_compute_instance" "shell" {
     }
   }
 
+  provisioner "file" {
+    source      = "${path.module}/k8s-cluster.yml"
+    destination = "/home/ubuntu/k8s-cluster.yml"
+
+    connection {
+        host = "${self.network_interface.0.access_config.0.nat_ip}"
+        type = "ssh"
+        user = "ubuntu"
+        private_key = "${tls_private_key.generated_keypair.private_key_pem}"
+    }
+  }
+   provisioner "file" {
+    source      = "${path.module}/all.yml"
+    destination = "/home/ubuntu/all.yml"
+
+    connection {
+        host = "${self.network_interface.0.access_config.0.nat_ip}"
+        type = "ssh"
+        user = "ubuntu"
+        private_key = "${tls_private_key.generated_keypair.private_key_pem}"
+    }
+  }
+
   provisioner "remote-exec" {
     inline = [
       "chmod 400 /home/ubuntu/.ssh/id_rsa",

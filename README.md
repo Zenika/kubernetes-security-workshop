@@ -309,7 +309,7 @@ Ces deux Pods utilisent le Service Account `default` du Namespace `default` et
 par défaut nous avons donné les droits à ces Pods de lister tous les Pods du
 cluster.
 L'objectif est de faire en sorte que seul le Pod `podreader` ait les droits
-pour afficher les Pod du cluster.
+pour afficher les Pods du cluster.
 
 - Créez un descripteur pour un Service Account `rbac` dans le Namespace du même
   nom. Aidez vous de

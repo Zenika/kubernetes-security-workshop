@@ -233,7 +233,7 @@ kubectl exec -it <anypod> bash
 curl frontend
 curl backend
 (printf "PING\r\n";) | nc redis 6379
-````
+```
 
 Appliquons une première NetworkPolicy pour limiter l'accès à la base de données:
 ```yaml

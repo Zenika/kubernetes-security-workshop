@@ -318,6 +318,12 @@ pour afficher les Pods du cluster.
   ce ServiceAccount et ait les droits de lister les Pods du cluster alors que
   `shell-pod` ne les ait plus.
 
+Il est nécessaire d'être extrêmement vigilant avec les droits qui sont
+attribués au travers du RBAC. En particulier sur les ressources critiques
+du cluster du point de vue de la sécurité :
+
+- LimitRange, Quotas, PodSecurityPolicy, Role, RoleBinding, ClusterRole, ...
+
 ### 04 : PodSecurityPolicy
 
 Lors de la première étape, nous avons vu qu'il n'était pas souhaitable de

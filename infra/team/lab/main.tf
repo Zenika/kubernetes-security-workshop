@@ -1,4 +1,9 @@
 
+provider "google" {
+  credentials = "${file("account.json")}"
+  region      = "europe-west1"
+}
+
 data "google_project" "team-project" {
   project_id = "ksw-${var.team_name}"
 }
@@ -159,6 +164,7 @@ resource "google_compute_instance" "shell" {
       "sudo cp /home/ubuntu/cluster-init.sh /usr/local/bin",
       "sudo chmod 755 /usr/local/bin/cluster-init.sh",
       "/usr/local/bin/cluster-init.sh",
+      "echo ubuntu:${var.password} | sudo chpasswd"
     ]
     connection {
         host = "${self.network_interface.0.access_config.0.nat_ip}"

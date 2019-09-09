@@ -1,5 +1,7 @@
 variable "team_name" {}
 
+variable "password" {}
+
 variable "folder_id" {}
 
 variable "region" {

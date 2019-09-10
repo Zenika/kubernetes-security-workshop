@@ -556,7 +556,7 @@ Dans ce cas là, vous pouvez consulter l'état du Job avec la commande :
 Et en consulter les logs avec la commande :
 `kubectl logs <pod name>`
 
-- Quelles sont les problèmes détectés ?
+- Quels sont les problèmes détectés ?
 - Sauriez-vous les résoudre ?
 
 Pour information, lorsqu'une requête est faite sans authentification, elle est

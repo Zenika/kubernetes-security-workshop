@@ -514,4 +514,50 @@ Une fois ces tests réalisés :
  - Falco
 
 ### 06 : Comprendre l’importance des mises à jours suite à une CVE
- - Exploiter une cve fixée (maj cluster)
+
+Afin de s'assurer que le Cluster Kubernetes déployé ne comporte pas de failles
+liées à des erreurs de configuration ou des 
+[CVE](https://fr.wikipedia.org/wiki/Common_Vulnerabilities_and_Exposures), il
+existe des outils permettant de le scanner.
+
+L'outil que nous allons mettre en oeuvre ici est 
+[kube-hunter](https://github.com/aquasecurity/kube-hunter) 
+d'[Aqua Security](https://www.aquasec.com/).
+
+Exemple de résultat :
+
+```txt
+Vulnerabilities
++------------------+----------------------+----------------------+----------------------+----------+
+| LOCATION         | CATEGORY             | VULNERABILITY        | DESCRIPTION          | EVIDENCE |
++------------------+----------------------+----------------------+----------------------+----------+
+| 10.132.0.21:6443 | Information          | K8s Version          | The kubernetes       | v1.15.3  |
+|                  | Disclosure           | Disclosure           | version could be     |          |
+|                  |                      |                      | obtained from the    |          |
+|                  |                      |                      | /version endpoint    |          |
++------------------+----------------------+----------------------+----------------------+----------+
+```
+
+Cet outil peut fonctionner de 2 manières :
+
+- Depuis l'extérieur, en utilisant une image Docker :
+  `docker run -it --rm aquasec/kube-hunter --remote 10.132.0.21`
+
+Vous pouvez alors consulter directement les résultats.
+Il est également possible de scanner tout un range d'adresse réseau pour
+trouver tout les composants susceptibles d'être en écoute :
+`docker run -it --rm aquasec/kube-hunter --cidr 10.132.0.0/24`
+
+- Depuis l'intérieur du cluster, sous forme de Job Kubernetes, voir 
+  `06-scan-cluster/kube-hunter-job.yaml`
+
+Dans ce cas là, vous pouvez consulter l'état du Job avec la commande :
+`kubectl describe job kube-hunter`
+Et en consulter les logs avec la commande :
+`kubectl logs <pod name>`
+
+- Quelles sont les problèmes détectés ?
+- Sauriez-vous les résoudre ?
+
+Pour information, lorsqu'une requête est faite sans authentification, elle est
+associée au groupe `system:unauthenticated`.

@@ -561,7 +561,7 @@ Les règles par défaut se trouvent ici : <https://github.com/falcosecurity/falc
 
 Falco ne fait que de l'audit. Une fois cet outils mis en place, on peut le configurer pour publier ses événements en format JSON. En envoyant ces événements dans une queue et en ayant une fonction qui réagit à ces événements, nous pouvons avoir un action comme par exemple: effacer un pod si un shell est ouvert. Vous pouvez retrouver un exemple de mise en place : <https://github.com/falcosecurity/kubernetes-response-engine>
 
-### 06 : Comprendre l’importance des mises à jours suite à une CVE
+## 06 : Comprendre l’importance des mises à jours suite à une CVE
 
 Afin de s'assurer que le Cluster Kubernetes déployé ne comporte pas de failles
 liées à des erreurs de configuration ou des

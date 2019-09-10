@@ -541,7 +541,7 @@ Vulnerabilities
 Cet outil peut fonctionner de 2 manières :
 
 - Depuis l'extérieur, en utilisant une image Docker :
-  `docker run -it --rm aquasec/kube-hunter --remote 10.132.0.21`
+  `docker container run -it --rm aquasec/kube-hunter --remote 10.132.0.21`
 
 Vous pouvez alors consulter directement les résultats.
 Il est également possible de scanner tout un range d'adresse réseau pour

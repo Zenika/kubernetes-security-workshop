@@ -275,11 +275,11 @@ spec:
 Essayez de nouveau de faire le ping vers redis depuis le frontend, celui-ci ne devrait plus fonctionner.
 Créez les NetworkPolicies suivantes:
 
-- Autoriser la communication vers le pod backend seulement depuis le pod frontend
-- Refuser toute communication vers le pods frontend
-- Refuser la communication depuis le pod frontend vers internet
+- Autoriser la communication vers le Pod backend seulement depuis le Pod frontend
+- Refuser toute communication vers le Pods frontend
+- Refuser la communication depuis le Pod frontend vers internet
 
-Pour vous aidez :
+Pour vous aider :
 
 - La documentation des NetworkPolicies : <https://kubernetes.io/docs/concepts/services-networking/network-policies/>
 - Des exemples de NetworkPolicies : <https://github.com/ahmetb/kubernetes-network-policy-recipes>
@@ -295,7 +295,7 @@ Grâce aux NetworkPolicies, vous pouvez donc :
 - Maitriser les flux entre vos applications pour vous prémunir d'erreurs éventuelles
 - Limiter l'impact d'une intrusion en limitant les appels réseaux possibles
 
-Pour aller plus loin, vous pouvez regarder le network addon Cilium qui permet d'avoir des CiliumNetworkPolicies qui vont vous permettre de limiter des accès de manière plus fines comme par exemple définir à quelle ressource REST un Pod peut accéder. Plus d'informations : <https://cilium.io/blog/2018/09/19/kubernetes-network-policies/>
+Pour aller plus loin, vous pouvez regarder le network addon Cilium qui permet d'avoir des CiliumNetworkPolicies qui vont vous permettre de limiter des accès de manière plus fine comme par exemple définir à quelle ressource REST un Pod peut accéder. Plus d'informations : <https://cilium.io/blog/2018/09/19/kubernetes-network-policies/>
 
 ## 03 : Bien exploiter le RBAC
 
@@ -530,35 +530,46 @@ Vous devriez voir un message du type :
 
 En vous aidant de la documentation, modifiez le déploiement pour y ajouter un
 SecurityContext à la définition des Pods afin que les conteneurs fonctionnent
-avec un autre utilisateur que `root` et puissent être créés et démarrés. 
+avec un autre utilisateur que `root` et puissent être créés et démarrés.
 
 Une fois ces tests réalisés :
 
 - Supprimez le déploiement
 - Désactivez l'admission plugin `PodSecurityPolicy`
 
-## 05 : détecter des comportements non souhaités au runtime 
+## 05 : détecter des comportements non souhaités au runtime
 
 Dans les parties précédentes, nous avons vu comment configurer un cluster pour pouvoir mitiger des manipulations accidentelles ou volontaires qui pourraient porter atteinte à son intégrité.
 
 Mais comment détecter un comportement lorsque le cluster fonctionne ? Nous allons utiliser un outils de détection d'intrusion et de comportement anormal.
 [Falco](https://falco.org/) est un outils de la CNCF qui permet de faire cela.
 
-Pour installer:
+Pour l'installer:
 
 ```bash
 helm install --name falco stable/falco
 ```
 
+Une fois installé, Falco va auditer en permanence votre cluster. De base un ensemble de règles sont activées pour surveiller le comportement de votre cluster.
+
+Les règles par défaut se trouvent ici : <https://github.com/falcosecurity/falco/blob/dev/rules/falco_rules.yaml>
+
+- Trouver la règle par défaut concernant le spawn de terminal
+- Instancier un terminal dans un pod
+- Regarder les logs de falco pour trouver l'événement déclenché
+- Déclencher un événement de niveau ERROR
+
+Falco ne fait que de l'audit. Une fois cet outils mis en place, on peut le configurer pour publier ses événements en format JSON. En envoyant ces événements dans une queue et en ayant une fonction qui réagit à ces événements, nous pouvons avoir un action comme par exemple: effacer un pod si un shell est ouvert. Vous pouvez retrouver un exemple de mise en place : <https://github.com/falcosecurity/kubernetes-response-engine>
+
 ### 06 : Comprendre l’importance des mises à jours suite à une CVE
 
 Afin de s'assurer que le Cluster Kubernetes déployé ne comporte pas de failles
-liées à des erreurs de configuration ou des 
+liées à des erreurs de configuration ou des
 [CVE](https://fr.wikipedia.org/wiki/Common_Vulnerabilities_and_Exposures), il
 existe des outils permettant de le scanner.
 
-L'outil que nous allons mettre en oeuvre ici est 
-[kube-hunter](https://github.com/aquasecurity/kube-hunter) 
+L'outil que nous allons mettre en oeuvre ici est
+[kube-hunter](https://github.com/aquasecurity/kube-hunter)
 d'[Aqua Security](https://www.aquasec.com/).
 
 Exemple de résultat :
@@ -585,7 +596,7 @@ Il est également possible de scanner tout un range d'adresse réseau pour
 trouver tous les composants susceptibles d'être en écoute :
 `docker container run -it --rm aquasec/kube-hunter --cidr 10.132.0.0/24`
 
-- Depuis l'intérieur du cluster, sous forme de Job Kubernetes, voir 
+- Depuis l'intérieur du cluster, sous forme de Job Kubernetes, voir
   `06-scan-cluster/kube-hunter-job.yaml`
 
 Dans ce cas là, vous pouvez consulter l'état du Job avec la commande :

@@ -47,7 +47,7 @@ sudo chown ubuntu:ubuntu ~/.kube/config
 
 echo "source <(kubectl completion bash)" >> ~/.bashrc
 
-echo "Installing helm"
+echo "⛑ Installing helm"
 wget https://get.helm.sh/helm-v2.13.1-linux-amd64.tar.gz
 tar -zxvf helm-v2.13.1-linux-amd64.tar.gz
 sudo mv linux-amd64/helm /usr/local/bin/helm

@@ -545,7 +545,7 @@ Cet outil peut fonctionner de 2 manières :
 
 Vous pouvez alors consulter directement les résultats.
 Il est également possible de scanner tout un range d'adresse réseau pour
-trouver tout les composants susceptibles d'être en écoute :
+trouver tous les composants susceptibles d'être en écoute :
 `docker container run -it --rm aquasec/kube-hunter --cidr 10.132.0.0/24`
 
 - Depuis l'intérieur du cluster, sous forme de Job Kubernetes, voir 

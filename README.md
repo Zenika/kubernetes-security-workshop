@@ -559,7 +559,8 @@ Les règles par défaut se trouvent ici : <https://github.com/falcosecurity/falc
 - Regarder les logs de falco pour trouver l'événement déclenché
 - Déclencher un événement de niveau ERROR
 
-Falco ne fait que de l'audit. Une fois cet outils mis en place, on peut le configurer pour publier ses événements en format JSON. En envoyant ces événements dans une queue et en ayant une fonction qui réagit à ces événements, nous pouvons avoir un action comme par exemple: effacer un pod si un shell est ouvert. Vous pouvez retrouver un exemple de mise en place : <https://github.com/falcosecurity/kubernetes-response-engine>
+Falco ne fait que de l'audit. Une fois cet outils mis en place, on peut le configurer pour publier ses événements en format JSON. En envoyant ces événements dans une queue et en ayant une fonction qui réagit à ces événements, nous pouvons déclencher une action.
+Par exemple: effacer un pod si un shell est ouvert. Vous pouvez retrouver un exemple de mise en place : <https://github.com/falcosecurity/kubernetes-response-engine>
 
 ## 06 : Comprendre l’importance des mises à jours suite à une CVE
 

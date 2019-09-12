@@ -3,6 +3,7 @@
 echo "🚀 Initializing machine"
 sudo apt-get update
 sudo apt-get install -y docker.io unzip
+sudo usermod -aG docker ubuntu
 
 export CLOUD_SDK_REPO="cloud-sdk-$(lsb_release -c -s)"
 echo "deb http://packages.cloud.google.com/apt $CLOUD_SDK_REPO main" | sudo tee -a /etc/apt/sources.list.d/google-cloud-sdk.list
@@ -51,6 +52,7 @@ tar -zxvf helm-v2.13.1-linux-amd64.tar.gz
 sudo mv linux-amd64/helm /usr/local/bin/helm
 rm -f helm-v2.13.1-linux-amd64.tar.gz linux-amd64
 helm init --client-only
+helm install stable/traefik --namespace kube-system
 
 echo "🚸 adding tools"
 echo "source <(kubectl completion bash)" >> ~/.bashrc

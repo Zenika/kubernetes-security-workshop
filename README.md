@@ -613,7 +613,7 @@ Cet outil peut fonctionner de 2 manières :
   `docker container run -it --rm aquasec/kube-hunter --remote 10.132.0.21`
 
 Vous pouvez alors consulter directement les résultats.
-Il est également possible de scanner tout un range d'adresse réseau pour
+Il est également possible de scanner tout un range d'adresses réseau pour
 trouver tous les composants susceptibles d'être en écoute :
 `docker container run -it --rm aquasec/kube-hunter --cidr 10.132.0.0/24`
 
@@ -625,7 +625,7 @@ Dans ce cas là, vous pouvez consulter l'état du Job avec la commande :
 Et en consulter les logs avec la commande :
 `kubectl logs <pod name>`
 
-- Quels sont les problèmes détectés ?
+- Quels sont les problèmes détectés depuis l'extérieur ?
 - Sauriez-vous les résoudre ?
 
 Pour information, lorsqu'une requête est faite sans authentification, elle est

@@ -224,8 +224,11 @@ Les objets `LimitRange` permettent de s'assurer que dans un Namespace donné,
 tous les objets créés définiront les limites de ressources tout en respectant
 des valeurs minimum et maximum.
 
-Créez une `LimitRange` afin de s'assurer que lorsqu'un Pod est créé il ne
+En vous inspirant de la 
+[documentation](https://kubernetes.io/docs/concepts/policy/limit-range/),
+créez une `LimitRange` afin de s'assurer que lorsqu'un Pod est créé il ne
 puisse pas prendre toutes les ressources disponibles.
+Positionnez une valeur par défaut à `memory: "512Mi"` pour la limite.
 
 Recréez le Pod avec la commande précédente, et vérifiez que cette fois ci il est
 supprimé lorsqu'il occupe trop de ressources.

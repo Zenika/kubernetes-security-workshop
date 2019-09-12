@@ -566,9 +566,9 @@ The connection to the server 10.132.0.21:6443 was refused - did you specify the 
 
 Une fois l'API Server redémarré, essayer de re-déployer la version vulnérable
 de la première application.
-Vous devriez constater qu'aucun Pod n'est créé.
+Vous devriez constater que le Pod ne démarre pas.
 Essayons de savoir pourquoi avec la commande suivante :
-`kubectl describe replicaset`
+`kubectl describe pod <nom du pod>`
 
 Vous devriez voir un message du type :
 `Warning  Failed     2m27s (x8 over 3m50s)  kubelet, node2     Error: container has runAsNonRoot and image will run as root`

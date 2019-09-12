@@ -3,8 +3,9 @@
 Le but du workshop est d'apprendre comment sécuriser son cluster kubernetes par la pratique. Nous allons aborder les sujets suivant :
 
 - Les bonnes pratiques de sécurité des images de conteneur
-- La gestion des droits d'accès à l'API Kubernetes avec le RBAC
 - Cloisonner les composants d'un cluster Kubernetes
+- La gestion des droits d'accès à l'API Kubernetes avec le RBAC
+- Limiter les privilèges des conteneurs exécutés sur le cluster
 - La mise à jour d'un cluster suite à une CVE
 - Détecter des comportements anormaux au run
 

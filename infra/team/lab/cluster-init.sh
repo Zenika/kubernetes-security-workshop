@@ -52,6 +52,7 @@ tar -zxvf helm-v2.13.1-linux-amd64.tar.gz
 sudo mv linux-amd64/helm /usr/local/bin/helm
 rm -f helm-v2.13.1-linux-amd64.tar.gz linux-amd64
 helm init --client-only
+helm install stable/traefik --namespace kube-system
 
 echo "🚸 adding tools"
 echo "source <(kubectl completion bash)" >> ~/.bashrc

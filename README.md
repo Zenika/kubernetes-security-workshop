@@ -397,7 +397,7 @@ Certaines ressources sont transverses au cluster, elles sont :
 Certaines ressources sont cloisonnées par Namespace, elles sont :
 
 - gérées via les `Role`
-- attribuées via les `RoleBinding` ou les `ClusterRoleBinding`
+- attribuées via les `RoleBinding`
 
 Trouvez comment le rôle `cluster-admin` est associé aux requêtes effectuées via
 `kubectl` depuis la machine `shell`
@@ -431,6 +431,12 @@ Deux Pods seront créés `shell-pod` et `podreader`.
 Ces deux Pods utilisent le Service Account `default` du Namespace `default` et
 par défaut nous avons donné les droits à ces Pods de lister tous les Pods du
 cluster.
+Vous pouvez le tester en lançant les commande :
+
+`kubectl exec -it podreader kubectl get pods`
+
+`kubectl exec -it shell-pod kubectl get pods`
+
 L'objectif est de faire en sorte que seul le Pod `podreader` ait les droits
 pour afficher les Pods du cluster.
 
@@ -439,7 +445,8 @@ pour afficher les Pods du cluster.
   [cette documentation](https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/#use-multiple-service-accounts)
 - Modifiez les descripteurs pour faire en sorte que le Pod `podreader` utilise
   ce ServiceAccount et ait les droits de lister les Pods du cluster alors que
-  `shell-pod` ne les ait plus.
+  `shell-pod` ne les ait plus. Pour utiliser le ServiceAccount, le Pod devra
+  être créé dans le même Namespace.
 
 Il est nécessaire d'être extrêmement vigilant avec les droits qui sont
 attribués au travers du RBAC. En particulier sur les ressources critiques

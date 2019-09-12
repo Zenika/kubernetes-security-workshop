@@ -45,7 +45,7 @@ En interne du cluster les noeuds ont un nommage un peu différent :
 
 La sécurité d'un cluster Kubernetes commence par la sécurité des applications. Nous allons illustrer comment sécuriser une application vulnérable à une faille publiquement connue. L'exemple utilisé ici est une faille de rails publiée au début de 2019 (<https://nvd.nist.gov/vuln/detail/CVE-2019-5418>)
 
-### Construction et déploiement
+### 01.01 Construction et déploiement
 
 Nous vous fournissons déjà l'application bootstrapée, le Dockerfile et les descripteurs Kubernetes pour déployer l'application. Les fichiers sont dans le répertoire `/home/ubuntu/kubernetes-security-workshop/01-docker-images`
 
@@ -75,7 +75,7 @@ Deployer l'application dans Kubernetes :
 kubectl apply -f k8s
 ```
 
-### Exploitation de la faille
+### 01.02 Exploitation de la faille
 
 Une fois l'application démarrée, vous pouvez la requêter normalement pour obtenir le README du projet :
 
@@ -100,7 +100,7 @@ Cette faille peut être exploitée aussi pour ouvrir un shell à distance dans l
 
 Pour mitiger le problème, il y a deux étapes.
 
-### Changement d'utilisateur
+### 01.03 Changement d'utilisateur
 
 La première étape consiste à changer l'utilisateur avec lequel s'exécute l'application pour limiter les accès fichiers possibles via l'application.
 
@@ -138,7 +138,7 @@ curl 10.132.0.22:$INGRESS_PORT/rails/chybeta -H 'Accept: ../../../../../../../..
 
 À noter que cette pratique permet de mitiger d'éventuelles autres failles qui n'auraient pas encore de correctifs.
 
-### Mise à jour des dépendances
+### 01.04 Mise à jour des dépendances
 
 La seconde étape va être de mettre à jour la version de rails qui contient le fix de la CVE. Mettre à jour le fichier Gemfile avec une version fixée de rails.
 
@@ -160,7 +160,7 @@ Une fois le test effectué, supprimer le déploiement.
 kubectl delete -f k8s
 ```
 
-### Conclusion
+### 01.06 Conclusion
 
 La sécurité se joue a plusieurs niveaux pour une application :
 

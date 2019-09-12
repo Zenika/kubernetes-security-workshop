@@ -45,13 +45,13 @@ Les commandes à lancer :
 Construction de l'image :
 
 ```bash
-docker image build -t eu.gcr.io/<projet>/rails-with-cve:1 .
+docker image build -t eu.gcr.io/$PROJECT_ID/rails-with-cve:1 .
 ```
 
 Publication de l'image :
 
 ```bash
-docker image push eu.gcr.io/<projet>/rails-with-cve:1
+docker image push eu.gcr.io/$PROJECT_ID/rails-with-cve:1
 ```
 
 Déploiement de l'image :

@@ -228,7 +228,7 @@ En vous inspirant de la
 [documentation](https://kubernetes.io/docs/concepts/policy/limit-range/),
 créez une `LimitRange` afin de s'assurer que lorsqu'un Pod est créé il ne
 puisse pas prendre toutes les ressources disponibles.
-Positionnez une valeur par défaut à `memory: "512Mi"` pour la limite.
+Positionnez une valeur par défaut à `memory: "512Mi"` et `cpu: "10m"` pour la limite.
 
 Recréez le Pod avec la commande précédente, et vérifiez que cette fois ci il est
 supprimé lorsqu'il occupe trop de ressources.
@@ -238,12 +238,16 @@ ressources du cluster en augmentant le nombre d'instances du Pod qui tournent
 en même temps.
 Faites le test en lançant la commande (définissez une valeur suffisament élevée
 pour occuper toute la mémoire) :  
-`kubectl scale --replicas=10 deploy/exhauster`
+`kubectl scale --replicas=20 deploy/exhauster`
 
 À nouveau, lancez `kubectl get nodes -w`
 
 Et attendez quelques minutes de voir :
 `node3   NotReady   <none>   15h   v1.15.3`
+
+Il est également possible que le noeud reste disponible mais que les Pods
+restent en Pending. L'effet est le même pour les équipes qui partageraient
+ce cluster : les ressources ne sont plus disponibles.
 
 Nous allons voir comment empêcher la création d'un trop grand nombre de Pods.
 Mais avant tout, nous allons supprimer cette application.

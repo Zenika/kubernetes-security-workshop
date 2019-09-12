@@ -194,7 +194,7 @@ Un exemple est disponible à déployer sur votre cluster :
 `kubectl apply -f 02-partition/01-quota/malicious-deployment.yml`
 
 Ce déploiement va créer un Pod qui consommera toute la mémoire du noeud
-`node3`.
+`node3` / `worker-1`.
 
 - Lancez `kubectl get nodes -w`
 

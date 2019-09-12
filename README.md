@@ -1,6 +1,6 @@
 # kubernetes-security-workshop
 
-Le but du workshop est d'apprendre comment sécuriser son cluster kubernetes par la pratique. Nous allons aborder les sujets suivant :
+Le but du workshop est d'apprendre comment sécuriser son cluster Kubernetes par la pratique. Nous allons aborder les sujets suivant :
 
 - [Les bonnes pratiques de sécurité des images de conteneur](https://github.com/ebriand/kubernetes-security-workshop#01--construire-des-images-de-conteneurs-en-appliquant-les-bonnes-pratiques-de-s%C3%A9curit%C3%A9)
 - [Cloisonner les composants d'un cluster Kubernetes](https://github.com/ebriand/kubernetes-security-workshop#02--cloisonner-les-composants-dun-cluster)
@@ -99,7 +99,7 @@ La première étape consiste à changer l'utilisateur avec lequel s'exécute l'a
 Rajouter l'instruction USER à l'image Docker (ref: <https://docs.docker.com/engine/reference/builder/#user>)
 
 ```Dockerfile
-USER rails
+USER rails:rails
 ```
 
 Modifier l'instruction COPY pour refléter ce changement de droit (ref: <https://docs.docker.com/engine/reference/builder/#copy>)
@@ -113,7 +113,7 @@ groupadd --gid 1000 rails && useradd --uid 1000 --gid rails --shell /bin/bash --
 Construire, publier et redéployer l'image avec le tag :
 
 ```txt
-eu.gcr.io/<projet>/rails-with-cve:2
+eu.gcr.io/$PROJECT_ID/rails-with-cve:2
 ```
 
 Une fois la nouvelle version de l'application déployée, le curl précédent ne fonctionne plus pour récupérer `/etc/shadow` :
@@ -137,7 +137,7 @@ La seconde étape va être de mettre à jour la version de rails qui contient le
 Construire, publier et redéployer l'image avec le tag :
 
 ```txt
-eu.gcr.io/<projet>/rails-without-cve:1
+eu.gcr.io/$PROJECT_ID/rails-without-cve:1
 ```
 
 Une fois la nouvelle version de l'application déployée, le curl précédent ne fonctionne plus pour récupérer des fichiers du conteneur indépendamment de leur propriétaire :
@@ -146,7 +146,11 @@ Une fois la nouvelle version de l'application déployée, le curl précédent ne
 curl <node-external-ip>/rails/chybeta -H 'Accept: ../../../../../../../../../../demo/Gemfile{{'
 ```
 
-Une fois le test effectué supprimer le déploiement.
+Une fois le test effectué, supprimer le déploiement.
+
+```bash
+kubectl delete -f k8s
+```
 
 ### Conclusion
 
@@ -165,7 +169,7 @@ Vous pouvez retrouver d'autres pratiques pour améliorer la sécurité de vos im
 Lorsqu'on utilise Kubernetes, les
 [Namespaces](https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/#)
 permettent d'organiser et de partager les ressources disponibles sur un cluster
-kubernetes entre plusieurs équipes.
+Kubernetes entre plusieurs équipes.
 Afin que cette cohabition se passe au mieux, l'API Kubernetes expose des
 ressources utilisées pour limiter et maîtriser ce que chaque équipe peut faire.
 

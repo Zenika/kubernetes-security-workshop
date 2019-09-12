@@ -160,7 +160,7 @@ cluster).
 Un exemple est disponible à déployer sur votre cluster :
 `kubectl apply -f 02-partition/01-quota/malicious-deployment.yml`
 
-Ce déploiement va créer un Pod qui consommera toutes la mémoire du noeud
+Ce déploiement va créer un Pod qui consommera toute la mémoire du noeud
 `node3`.
 
 - Lancez `kubectl get nodes -w`
@@ -185,7 +185,7 @@ Avec Kubernetes, comme avec Docker, il est possible de définir des limites
 de ressources affectées aux conteneurs. Pour plus de renseignements sur ce
 mécanisme, vous pouvez consulter la documentation officielle [ici](https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/).
 
-Néanmoins, ce mécanisme seule ne suffit pas. En effet il est toujours possible
+Néanmoins, ce mécanisme seul ne suffit pas. En effet il est toujours possible
 de créer des Pods sans déclarer les `limits` associées.
 Les objets `LimitRange` permettent de s'assurer que dans un Namespace donné,
 tous les objets créés définiront les limites de ressources tout en respectant
@@ -194,7 +194,7 @@ des valeurs minimum et maximum.
 Créez une `LimitRange` afin de s'assurer que lorsqu'un Pod est créé il ne
 puisse pas prendre toutes les ressources disponibles.
 
-Recréez le Pod avec la commande ci-après, et vérifiez que cette fois ci il est
+Recréez le Pod avec la commande précédente, et vérifiez que cette fois ci il est
 supprimé lorsqu'il occupe trop de ressources.
 
 Malheureusement, même ainsi, il est toujours possible d'occuper toutes les

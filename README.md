@@ -2,11 +2,12 @@
 
 Le but du workshop est d'apprendre comment sécuriser son cluster kubernetes par la pratique. Nous allons aborder les sujets suivant :
 
-- Les bonnes pratiques de sécurité des images de conteneur
-- La gestion des droits d'accès à l'API Kubernetes avec le RBAC
-- Cloisonner les composants d'un cluster Kubernetes
-- La mise à jour d'un cluster suite à une CVE
-- Détecter des comportements anormaux au run
+- [Les bonnes pratiques de sécurité des images de conteneur](https://github.com/ebriand/kubernetes-security-workshop#construire-des-images-de-conteneurs-en-appliquant-les-bonnes-pratiques-de-s%C3%A9curit%C3%A9)
+- [Cloisonner les composants d'un cluster Kubernetes](https://github.com/ebriand/kubernetes-security-workshop#02--cloisonner-les-composants-dun-cluster)
+- [La gestion des droits d'accès à l'API Kubernetes avec le RBAC](https://github.com/ebriand/kubernetes-security-workshop#03--bien-exploiter-le-rbac)
+- [Limiter les privilèges des conteneurs exécutés sur le cluster](https://github.com/ebriand/kubernetes-security-workshop#04--podsecuritypolicy)
+- [La mise à jour d'un cluster suite à une CVE](https://github.com/ebriand/kubernetes-security-workshop#05--comprendre-limportance-des-mises-%C3%A0-jours-suite-%C3%A0-une-cve)
+- [Détecter des comportements anormaux au run](https://github.com/ebriand/kubernetes-security-workshop#06--d%C3%A9tecter-des-comportements-non-souhait%C3%A9s-au-runtime)
 
 Le workshop commencera d'abord par une présentation générale des différents concepts abordés avant de vous laisser avancer à votre rythme.
 
@@ -548,32 +549,7 @@ Une fois ces tests réalisés :
 - Supprimez le déploiement
 - Désactivez l'admission plugin `PodSecurityPolicy`
 
-## 05 : détecter des comportements non souhaités au runtime
-
-Dans les parties précédentes, nous avons vu comment configurer un cluster pour pouvoir mitiger des manipulations accidentelles ou volontaires qui pourraient porter atteinte à son intégrité.
-
-Mais comment détecter un comportement lorsque le cluster fonctionne ? Nous allons utiliser un outils de détection d'intrusion et de comportement anormal.
-[Falco](https://falco.org/) est un outils de la CNCF qui permet de faire cela.
-
-Pour l'installer:
-
-```bash
-helm install --name falco stable/falco
-```
-
-Une fois installé, Falco va auditer en permanence votre cluster. De base un ensemble de règles sont activées pour surveiller le comportement de votre cluster.
-
-Les règles par défaut se trouvent ici : <https://github.com/falcosecurity/falco/blob/dev/rules/falco_rules.yaml>
-
-- Trouver la règle par défaut concernant le spawn de terminal
-- Instancier un terminal dans un pod
-- Regarder les logs de falco pour trouver l'événement déclenché
-- Déclencher un événement de niveau ERROR
-
-Falco ne fait que de l'audit. Une fois cet outils mis en place, on peut le configurer pour publier ses événements en format JSON. En envoyant ces événements dans une queue et en ayant une fonction qui réagit à ces événements, nous pouvons déclencher une action.
-Par exemple: effacer un pod si un shell est ouvert. Vous pouvez retrouver un exemple de mise en place : <https://github.com/falcosecurity/kubernetes-response-engine>
-
-## 06 : Comprendre l’importance des mises à jours suite à une CVE
+## 05 : Comprendre l’importance des mises à jours suite à une CVE
 
 Afin de s'assurer que le Cluster Kubernetes déployé ne comporte pas de failles
 liées à des erreurs de configuration ou des
@@ -621,3 +597,28 @@ Et en consulter les logs avec la commande :
 
 Pour information, lorsqu'une requête est faite sans authentification, elle est
 associée au groupe `system:unauthenticated`.
+
+## 06 : détecter des comportements non souhaités au runtime
+
+Dans les parties précédentes, nous avons vu comment configurer un cluster pour pouvoir mitiger des manipulations accidentelles ou volontaires qui pourraient porter atteinte à son intégrité.
+
+Mais comment détecter un comportement lorsque le cluster fonctionne ? Nous allons utiliser un outils de détection d'intrusion et de comportement anormal.
+[Falco](https://falco.org/) est un outils de la CNCF qui permet de faire cela.
+
+Pour l'installer:
+
+```bash
+helm install --name falco stable/falco
+```
+
+Une fois installé, Falco va auditer en permanence votre cluster. De base un ensemble de règles sont activées pour surveiller le comportement de votre cluster.
+
+Les règles par défaut se trouvent ici : <https://github.com/falcosecurity/falco/blob/dev/rules/falco_rules.yaml>
+
+- Trouver la règle par défaut concernant le spawn de terminal
+- Instancier un terminal dans un pod
+- Regarder les logs de falco pour trouver l'événement déclenché
+- Déclencher un événement de niveau ERROR
+
+Falco ne fait que de l'audit. Une fois cet outils mis en place, on peut le configurer pour publier ses événements en format JSON. En envoyant ces événements dans une queue et en ayant une fonction qui réagit à ces événements, nous pouvons déclencher une action.
+Par exemple: effacer un pod si un shell est ouvert. Vous pouvez retrouver un exemple de mise en place : <https://github.com/falcosecurity/kubernetes-response-engine>

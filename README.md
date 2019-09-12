@@ -1,8 +1,8 @@
 # kubernetes-security-workshop
 
-Le but du workshop est d'apprendre comment sécuriser son cluster kubernetes par la pratique. Nous allons aborder les sujets suivant :
+Le but du workshop est d'apprendre comment sécuriser son cluster Kubernetes par la pratique. Nous allons aborder les sujets suivant :
 
-- [Les bonnes pratiques de sécurité des images de conteneur](https://github.com/ebriand/kubernetes-security-workshop#construire-des-images-de-conteneurs-en-appliquant-les-bonnes-pratiques-de-s%C3%A9curit%C3%A9)
+- [Les bonnes pratiques de sécurité des images de conteneur](https://github.com/ebriand/kubernetes-security-workshop#01--construire-des-images-de-conteneurs-en-appliquant-les-bonnes-pratiques-de-s%C3%A9curit%C3%A9)
 - [Cloisonner les composants d'un cluster Kubernetes](https://github.com/ebriand/kubernetes-security-workshop#02--cloisonner-les-composants-dun-cluster)
 - [La gestion des droits d'accès à l'API Kubernetes avec le RBAC](https://github.com/ebriand/kubernetes-security-workshop#03--bien-exploiter-le-rbac)
 - [Limiter les privilèges des conteneurs exécutés sur le cluster](https://github.com/ebriand/kubernetes-security-workshop#04--podsecuritypolicy)
@@ -18,8 +18,10 @@ Pour pouvoir continuer à avancer même si une étape est problématique, nous v
 Au début du workshop, nous vous avons donné les informations pour vous connecter. La commande à lancer pour se connecter :
 
 ```bash
-ssh <user>@<host>
+ssh ubuntu@<host>
 ```
+
+Entrez le mot de passe fourni au début du workshop.
 
 Vous avez les 4 machines à disposition :
 ![Lab infrastructure](images/lab-infrastructure.png)
@@ -29,32 +31,45 @@ Vous avez les 4 machines à disposition :
   - Les autres machines sont accessibles directement via `ssh <hostname>`.
     Exemple: `ssh controller`
   - L'énoncé du workshop et les ressources sont déployées dans `/home/ubuntu/kubernetes-security-workshop` via un clone du repository
+  - Dans chacune des étapes, vous retrouverez un sous répertoire `solution` si vous avez besoin de vous débloquer.
 - Le `controller`, control-plane du cluster Kubernetes
-- `worker0` et `worker1`, 2 workers du cluster Kubernetes
+- `worker-0` et `worker-1`, 2 workers du cluster Kubernetes
 
-## Construire des images de conteneurs en appliquant les bonnes pratiques de sécurité
+En interne du cluster les noeuds ont un nommage un peu différent :
+
+- `controller` : `node1`
+- `worker-0` : `node2`
+- `worker-1` : `node3`
+
+## 01 : Construire des images de conteneurs en appliquant les bonnes pratiques de sécurité
 
 La sécurité d'un cluster Kubernetes commence par la sécurité des applications. Nous allons illustrer comment sécuriser une application vulnérable à une faille publiquement connue. L'exemple utilisé ici est une faille de rails publiée au début de 2019 (<https://nvd.nist.gov/vuln/detail/CVE-2019-5418>)
 
 ### Construction et déploiement
 
-Nous vous fournissons déjà l'application bootstrapée, le Dockerfile et les descripteurs Kubernetes pour déployer l'application.
+Nous vous fournissons déjà l'application bootstrapée, le Dockerfile et les descripteurs Kubernetes pour déployer l'application. Les fichiers sont dans le répertoire `/home/ubuntu/kubernetes-security-workshop/01-docker-images`
 
 Les commandes à lancer :
 
-Construction de l'image :
+Construire l'image :
 
 ```bash
-docker image build -t eu.gcr.io/<projet>/rails-with-cve:1 .
+docker image build -t eu.gcr.io/$PROJECT_ID/rails-with-cve:1 .
 ```
 
-Publication de l'image :
+Publier l'image :
 
 ```bash
-docker image push eu.gcr.io/<projet>/rails-with-cve:1
+docker image push eu.gcr.io/$PROJECT_ID/rails-with-cve:1
 ```
 
-Déploiement de l'image :
+Corriger le nom de l'image dans le fichier de deploiement `k8s/01_deployment.yaml`, remplacer PROJECT_ID par la valeur donnée par:
+
+```bash
+echo $PROJECT_ID
+```
+
+Deployer l'application dans Kubernetes :
 
 ```bash
 kubectl apply -f k8s
@@ -67,14 +82,16 @@ Une fois l'application démarrée, vous pouvez la requêter normalement pour obt
 ```bash
 # Pour obtenir l'ip des noeuds
 kubectl get nodes -o wide
-# Utiliser une external ip
-curl <node-external-ip>/rails/chybeta
+# Obtenir le port de l'ingress controller
+export INGRESS_PORT=$(kubectl get svc -n kube-system traefik-ingress-service -o jsonpath={.spec.ports[0].nodePort})
+# Utiliser une ip d'un node
+curl 10.132.0.22:$INGRESS_PORT/rails/chybeta
 ```
 
 Mais avec la faille présente dans cette version de rails, nous pouvons facilement récupérer n'importe quel fichier du conteneur !
 
 ```bash
-curl <node-external-ip>/rails/chybeta -H 'Accept: ../../../../../../../../../../etc/shadow{{'
+curl 10.132.0.22:$INGRESS_PORT/rails/chybeta -H 'Accept: ../../../../../../../../../../etc/shadow{{'
 ```
 
 Vous pouvez retrouver une explication de la faille : <https://chybeta.github.io/2019/03/16/Analysis-for%E3%80%90CVE-2019-5418%E3%80%91File-Content-Disclosure-on-Rails/>
@@ -90,7 +107,7 @@ La première étape consiste à changer l'utilisateur avec lequel s'exécute l'a
 Rajouter l'instruction USER à l'image Docker (ref: <https://docs.docker.com/engine/reference/builder/#user>)
 
 ```Dockerfile
-USER rails
+USER rails:rails
 ```
 
 Modifier l'instruction COPY pour refléter ce changement de droit (ref: <https://docs.docker.com/engine/reference/builder/#copy>)
@@ -104,19 +121,19 @@ groupadd --gid 1000 rails && useradd --uid 1000 --gid rails --shell /bin/bash --
 Construire, publier et redéployer l'image avec le tag :
 
 ```txt
-eu.gcr.io/<projet>/rails-with-cve:2
+eu.gcr.io/$PROJECT_ID/rails-with-cve:2
 ```
 
 Une fois la nouvelle version de l'application déployée, le curl précédent ne fonctionne plus pour récupérer `/etc/shadow` :
 
 ```bash
-curl <node-external-ip>/rails/chybeta -H 'Accept: ../../../../../../../../../../etc/shadow{{'
+curl 10.132.0.22:$INGRESS_PORT/rails/chybeta -H 'Accept: ../../../../../../../../../../etc/shadow{{'
 ```
 
 Mais on peut toujours requêter d'autres fichiers :
 
 ```bash
-curl <node-external-ip>/rails/chybeta -H 'Accept: ../../../../../../../../../../demo/Gemfile{{'
+curl 10.132.0.22:$INGRESS_PORT/rails/chybeta -H 'Accept: ../../../../../../../../../../demo/Gemfile{{'
 ```
 
 À noter que cette pratique permet de mitiger d'éventuelles autres failles qui n'auraient pas encore de correctifs.
@@ -128,16 +145,20 @@ La seconde étape va être de mettre à jour la version de rails qui contient le
 Construire, publier et redéployer l'image avec le tag :
 
 ```txt
-eu.gcr.io/<projet>/rails-without-cve:1
+eu.gcr.io/$PROJECT_ID/rails-without-cve:1
 ```
 
 Une fois la nouvelle version de l'application déployée, le curl précédent ne fonctionne plus pour récupérer des fichiers du conteneur indépendamment de leur propriétaire :
 
 ```bash
-curl <node-external-ip>/rails/chybeta -H 'Accept: ../../../../../../../../../../demo/Gemfile{{'
+curl 10.132.0.22:$INGRESS_PORT/rails/chybeta -H 'Accept: ../../../../../../../../../../demo/Gemfile{{'
 ```
 
-Une fois le test effectué supprimer le déploiement.
+Une fois le test effectué, supprimer le déploiement.
+
+```bash
+kubectl delete -f k8s
+```
 
 ### Conclusion
 
@@ -156,7 +177,7 @@ Vous pouvez retrouver d'autres pratiques pour améliorer la sécurité de vos im
 Lorsqu'on utilise Kubernetes, les
 [Namespaces](https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/#)
 permettent d'organiser et de partager les ressources disponibles sur un cluster
-kubernetes entre plusieurs équipes.
+Kubernetes entre plusieurs équipes.
 Afin que cette cohabition se passe au mieux, l'API Kubernetes expose des
 ressources utilisées pour limiter et maîtriser ce que chaque équipe peut faire.
 
@@ -173,11 +194,11 @@ Un exemple est disponible à déployer sur votre cluster :
 `kubectl apply -f 02-partition/01-quota/malicious-deployment.yml`
 
 Ce déploiement va créer un Pod qui consommera toute la mémoire du noeud
-`node3`.
+`node3` / `worker-1`.
 
 - Lancez `kubectl get nodes -w`
 
-Au bout de quelques minutes vous verrez :
+Au bout de quelques instants vous verrez :
 `node3   NotReady   <none>   15h   v1.15.3`
 
 L'ensemble de la mémoire disponible sur ce noeud a été consommé et il n'est
@@ -203,8 +224,11 @@ Les objets `LimitRange` permettent de s'assurer que dans un Namespace donné,
 tous les objets créés définiront les limites de ressources tout en respectant
 des valeurs minimum et maximum.
 
-Créez une `LimitRange` afin de s'assurer que lorsqu'un Pod est créé il ne
+En vous inspirant de la 
+[documentation](https://kubernetes.io/docs/concepts/policy/limit-range/),
+créez une `LimitRange` afin de s'assurer que lorsqu'un Pod est créé il ne
 puisse pas prendre toutes les ressources disponibles.
+Positionnez une valeur par défaut à `memory: "512Mi"` et `cpu: "10m"` pour la limite.
 
 Recréez le Pod avec la commande précédente, et vérifiez que cette fois ci il est
 supprimé lorsqu'il occupe trop de ressources.
@@ -214,12 +238,16 @@ ressources du cluster en augmentant le nombre d'instances du Pod qui tournent
 en même temps.
 Faites le test en lançant la commande (définissez une valeur suffisament élevée
 pour occuper toute la mémoire) :  
-`kubectl scale --replicas=10 deploy/exhauster`
+`kubectl scale --replicas=20 deploy/exhauster`
 
 À nouveau, lancez `kubectl get nodes -w`
 
 Et attendez quelques minutes de voir :
 `node3   NotReady   <none>   15h   v1.15.3`
+
+Il est également possible que le noeud reste disponible mais que les Pods
+restent en Pending. L'effet est le même pour les équipes qui partageraient
+ce cluster : les ressources ne sont plus disponibles.
 
 Nous allons voir comment empêcher la création d'un trop grand nombre de Pods.
 Mais avant tout, nous allons supprimer cette application.
@@ -239,7 +267,7 @@ Tester votre solution en appliquant à nouveau le déploiement :
 `kubectl apply -f 02-partition/01-quota/malicious-deployment.yml`
 
 Et en multipliant le nombre d'instances désirées :
-`kubectl scale --replicas=10 deploy/exhauster`
+`kubectl scale --replicas=20 deploy/exhauster`
 
 ### 02.02 : NetworkPolicy
 
@@ -259,7 +287,7 @@ Sans NetworkPolicies, tout Pod peut communiquer avec un autre:
 
 ```bash
 kubectl get pods -n app
-kubectl exec -it <anypod> bash
+kubectl exec -n app -it <anypod> bash
 curl frontend
 curl backend
 (printf "PING\r\n";) | nc redis 6379
@@ -316,7 +344,7 @@ authentifiées :
 
 - les requêtes effectuées depuis votre poste utilisent un compte associé à un certificat.
   Vous pouvez le consulter à l'aide de la commande suivante :
-  `grep client-certificate-data .kube/config | awk '{ print $2 }' | base64 -d | openssl x509 -in - -noout -text | grep "Subject:"`
+  `grep client-certificate-data ~/.kube/config | awk '{ print $2 }' | base64 -d | openssl x509 -in - -noout -text | grep "Subject:"`
 - les requêtes effectuées dans le cluster sont réalisées par des
   [ServiceAccount](https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/)
   Pour en savoir plus sur les ServiceAccount vous pouvez également consulter
@@ -369,7 +397,7 @@ Certaines ressources sont transverses au cluster, elles sont :
 Certaines ressources sont cloisonnées par Namespace, elles sont :
 
 - gérées via les `Role`
-- attribuées via les `RoleBinding` ou les `ClusterRoleBinding`
+- attribuées via les `RoleBinding`
 
 Trouvez comment le rôle `cluster-admin` est associé aux requêtes effectuées via
 `kubectl` depuis la machine `shell`
@@ -403,6 +431,12 @@ Deux Pods seront créés `shell-pod` et `podreader`.
 Ces deux Pods utilisent le Service Account `default` du Namespace `default` et
 par défaut nous avons donné les droits à ces Pods de lister tous les Pods du
 cluster.
+Vous pouvez le tester en lançant les commande :
+
+`kubectl exec -it podreader kubectl get pods`
+
+`kubectl exec -it shell-pod kubectl get pods`
+
 L'objectif est de faire en sorte que seul le Pod `podreader` ait les droits
 pour afficher les Pods du cluster.
 
@@ -411,7 +445,8 @@ pour afficher les Pods du cluster.
   [cette documentation](https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/#use-multiple-service-accounts)
 - Modifiez les descripteurs pour faire en sorte que le Pod `podreader` utilise
   ce ServiceAccount et ait les droits de lister les Pods du cluster alors que
-  `shell-pod` ne les ait plus.
+  `shell-pod` ne les ait plus. Pour utiliser le ServiceAccount, le Pod devra
+  être créé dans le même Namespace.
 
 Il est nécessaire d'être extrêmement vigilant avec les droits qui sont
 attribués au travers du RBAC. En particulier sur les ressources critiques
@@ -531,9 +566,9 @@ The connection to the server 10.132.0.21:6443 was refused - did you specify the 
 
 Une fois l'API Server redémarré, essayer de re-déployer la version vulnérable
 de la première application.
-Vous devriez constater qu'aucun Pod n'est créé.
+Vous devriez constater que le Pod ne démarre pas.
 Essayons de savoir pourquoi avec la commande suivante :
-`kubectl describe replicaset`
+`kubectl describe pod <nom du pod>`
 
 Vous devriez voir un message du type :
 `Warning  Failed     2m27s (x8 over 3m50s)  kubelet, node2     Error: container has runAsNonRoot and image will run as root`
@@ -578,7 +613,7 @@ Cet outil peut fonctionner de 2 manières :
   `docker container run -it --rm aquasec/kube-hunter --remote 10.132.0.21`
 
 Vous pouvez alors consulter directement les résultats.
-Il est également possible de scanner tout un range d'adresse réseau pour
+Il est également possible de scanner tout un range d'adresses réseau pour
 trouver tous les composants susceptibles d'être en écoute :
 `docker container run -it --rm aquasec/kube-hunter --cidr 10.132.0.0/24`
 
@@ -590,7 +625,7 @@ Dans ce cas là, vous pouvez consulter l'état du Job avec la commande :
 Et en consulter les logs avec la commande :
 `kubectl logs <pod name>`
 
-- Quels sont les problèmes détectés ?
+- Quels sont les problèmes détectés depuis l'extérieur ?
 - Sauriez-vous les résoudre ?
 
 Pour information, lorsqu'une requête est faite sans authentification, elle est

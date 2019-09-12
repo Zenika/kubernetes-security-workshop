@@ -13,6 +13,6 @@ spec:
     spec:
       containers:
       - name: rails-frontend
-        image: eu.gcr.io/kubernetes-security-workshop/rails-with-cve
+        image: eu.gcr.io/PROJECT_ID/rails-with-cve:1
         ports:
         - containerPort: 3000

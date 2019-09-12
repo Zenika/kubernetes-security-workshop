@@ -35,6 +35,12 @@ Vous avez les 4 machines à disposition :
 - Le `controller`, control-plane du cluster Kubernetes
 - `worker-0` et `worker-1`, 2 workers du cluster Kubernetes
 
+En interne du cluster les noeuds ont un nommage un peu différent :
+
+- `controller` : `node1`
+- `worker-0` : `node2`
+- `worker-1` : `node3`
+
 ## 01 : Construire des images de conteneurs en appliquant les bonnes pratiques de sécurité
 
 La sécurité d'un cluster Kubernetes commence par la sécurité des applications. Nous allons illustrer comment sécuriser une application vulnérable à une faille publiquement connue. L'exemple utilisé ici est une faille de rails publiée au début de 2019 (<https://nvd.nist.gov/vuln/detail/CVE-2019-5418>)

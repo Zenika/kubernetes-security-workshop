@@ -288,7 +288,7 @@ Essayez de nouveau de faire le ping vers redis depuis le frontend, celui-ci ne d
 Créez les NetworkPolicies suivantes:
 
 - Autoriser la communication vers le Pod backend seulement depuis le Pod frontend
-- Refuser toute communication vers le Pods frontend
+- Refuser toute communication vers le Pod frontend
 - Refuser la communication depuis le Pod frontend vers internet
 
 Pour vous aider :
@@ -314,8 +314,8 @@ Pour aller plus loin, vous pouvez regarder le network addon Cilium qui permet d'
 Lors des interactions avec un cluster Kubernetes, toutes les requêtes sont
 authentifiées :
 
-- les requêtes effectuées depuis votre poste utilisent un compte associé à un certificat
-  vous pouvez le consulter à l'aide de la commande suivante :
+- les requêtes effectuées depuis votre poste utilisent un compte associé à un certificat.
+  Vous pouvez le consulter à l'aide de la commande suivante :
   `grep client-certificate-data .kube/config | awk '{ print $2 }' | base64 -d | openssl x509 -in - -noout -text | grep "Subject:"`
 - les requêtes effectuées dans le cluster sont réalisées par des
   [ServiceAccount](https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/)
@@ -327,7 +327,7 @@ utilise le principe de Role-Based Access Control (RBAC).
 
 Un rôle donne des droits sur les ressources de l'API (lecture, modification, ...).
 
-L'action est autorisé si au moins un rôle donne les droits nécessaires à
+L'action est autorisée si au moins un rôle donne les droits nécessaires à
 l'utilisateur sur la ressource concernée.
 
 Exemple de rôle permettant de consulter les `Namespace`:
@@ -377,7 +377,7 @@ Trouvez comment le rôle `cluster-admin` est associé aux requêtes effectuées 
 Afin de simplifier les interactions avec l'API Server du cluster Kubernetes,
 par défaut un ServiceAccount est créé pour chaque Namespace.
 Les informations permettant de se connecter à l'API Server
-(token, cacert, ...) sont montés par défaut pour tous les Pods dans le
+(token, cacert, ...) sont montées par défaut pour tous les Pods dans le
 répertoire : `/var/run/secrets/kubernetes.io/serviceaccount`
 
 Certains composants déployés sur Kubernetes ont besoin d'autorisations
@@ -451,20 +451,18 @@ spec:
       allowPrivilegeEscalation: false
 ```
 
-Le second mécanisme s'appuie sur un plugin de Kubernetes qui va valider et
+Un second mécanisme, l'[Admission Controller](https://kubernetes.io/docs/reference/access-authn-authz/admission-controllers/) s'appuie sur un plugin de Kubernetes qui va valider et
 autoriser ou interdire les requêtes de création des Pods :
-
-- Un [Admission Controller](https://kubernetes.io/docs/reference/access-authn-authz/admission-controllers/).
 
 ![Admission controller phases](images/admission-controller-phases.png)
 
 L'admission plugin est nommé comme la ressource qu'il exploite :
 [PodSecurityPolicy](https://kubernetes.io/docs/concepts/policy/pod-security-policy/)
 
-Vous trouverez ci-dessous un example de `PodSecurityPolicy` qui interdit :
+Vous trouverez ci-dessous un exemple de `PodSecurityPolicy` qui interdit :
 
-- D'exécuter des conteneurs en mode privilégié
-- De monter des répertoire de l'hôte dans les conteneurs
+- d'exécuter des conteneurs en mode privilégié
+- de monter des répertoires de l'hôte dans les conteneurs
 
 ```yaml
 apiVersion: policy/v1beta1
@@ -549,7 +547,7 @@ Une fois ces tests réalisés :
 - Supprimez le déploiement
 - Désactivez l'admission plugin `PodSecurityPolicy`
 
-## 05 : Comprendre l’importance des mises à jours suite à une CVE
+## 05 : Comprendre l’importance des mises à jour suite à une CVE
 
 Afin de s'assurer que le Cluster Kubernetes déployé ne comporte pas de failles
 liées à des erreurs de configuration ou des
@@ -602,7 +600,7 @@ associée au groupe `system:unauthenticated`.
 
 Dans les parties précédentes, nous avons vu comment configurer un cluster pour pouvoir mitiger des manipulations accidentelles ou volontaires qui pourraient porter atteinte à son intégrité.
 
-Mais comment détecter un comportement lorsque le cluster fonctionne ? Nous allons utiliser un outils de détection d'intrusion et de comportement anormal.
+Mais comment détecter un comportement lorsque le cluster fonctionne ? Nous allons utiliser un outil de détection d'intrusion et de comportement anormal.
 [Falco](https://falco.org/) est un outils de la CNCF qui permet de faire cela.
 
 Pour l'installer:
@@ -620,5 +618,5 @@ Les règles par défaut se trouvent ici : <https://github.com/falcosecurity/falc
 - Regarder les logs de falco pour trouver l'événement déclenché
 - Déclencher un événement de niveau ERROR
 
-Falco ne fait que de l'audit. Une fois cet outils mis en place, on peut le configurer pour publier ses événements en format JSON. En envoyant ces événements dans une queue et en ayant une fonction qui réagit à ces événements, nous pouvons déclencher une action.
+Falco ne fait que de l'audit. Une fois cet outil mis en place, on peut le configurer pour publier ses événements en format JSON. En envoyant ces événements dans une queue et en ayant une fonction qui réagit à ces événements, nous pouvons déclencher une action.
 Par exemple: effacer un pod si un shell est ouvert. Vous pouvez retrouver un exemple de mise en place : <https://github.com/falcosecurity/kubernetes-response-engine>

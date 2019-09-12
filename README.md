@@ -267,7 +267,7 @@ Tester votre solution en appliquant à nouveau le déploiement :
 `kubectl apply -f 02-partition/01-quota/malicious-deployment.yml`
 
 Et en multipliant le nombre d'instances désirées :
-`kubectl scale --replicas=10 deploy/exhauster`
+`kubectl scale --replicas=20 deploy/exhauster`
 
 ### 02.02 : NetworkPolicy
 

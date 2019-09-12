@@ -3,6 +3,7 @@
 echo "🚀 Initializing machine"
 sudo apt-get update
 sudo apt-get install -y docker.io unzip
+sudo usermod -aG docker ubuntu
 
 export CLOUD_SDK_REPO="cloud-sdk-$(lsb_release -c -s)"
 echo "deb http://packages.cloud.google.com/apt $CLOUD_SDK_REPO main" | sudo tee -a /etc/apt/sources.list.d/google-cloud-sdk.list

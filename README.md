@@ -18,7 +18,7 @@ Pour pouvoir continuer à avancer même si une étape est problématique, nous v
 Au début du workshop, nous vous avons donné les informations pour vous connecter. La commande à lancer pour se connecter :
 
 ```bash
-ssh <user>@<host>
+ssh ubuntu@<host>
 ```
 
 Vous avez les 4 machines à disposition :
@@ -30,7 +30,7 @@ Vous avez les 4 machines à disposition :
     Exemple: `ssh controller`
   - L'énoncé du workshop et les ressources sont déployées dans `/home/ubuntu/kubernetes-security-workshop` via un clone du repository
 - Le `controller`, control-plane du cluster Kubernetes
-- `worker0` et `worker1`, 2 workers du cluster Kubernetes
+- `worker-0` et `worker-1`, 2 workers du cluster Kubernetes
 
 ## Construire des images de conteneurs en appliquant les bonnes pratiques de sécurité
 

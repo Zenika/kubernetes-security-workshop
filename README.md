@@ -20,6 +20,17 @@ Au début du workshop, nous vous avons donné les informations pour vous connect
 ssh <user>@<host>
 ```
 
+Vous avez les 4 machines à disposition :
+![Lab infrastructure](images/lab-infrastructure.png)
+
+- Une machine `shell` sur laquelle vous vous connectez par défaut.
+  - Sur cette machine sont installés différents outils : `kubectl`, `docker`, `gcloud`
+  - Les autres machines sont accessibles directement via `ssh <hostname>`.
+    Exemple: `ssh controller`
+  - L'énoncé du workshop et les ressources sont déployées dans `/home/ubuntu/kubernetes-security-workshop` via un clone du repository
+- Le `controller`, control-plane du cluster Kubernetes
+- `worker0` et `worker1`, 2 workers du cluster Kubernetes
+
 ## Construire des images de conteneurs en appliquant les bonnes pratiques de sécurité
 
 La sécurité d'un cluster Kubernetes commence par la sécurité des applications. Nous allons illustrer comment sécuriser une application vulnérable à une faille publiquement connue. L'exemple utilisé ici est une faille de rails publiée au début de 2019 (<https://nvd.nist.gov/vuln/detail/CVE-2019-5418>)

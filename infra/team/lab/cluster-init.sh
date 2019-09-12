@@ -45,8 +45,6 @@ mkdir ~/.kube
 sudo cp ~/kubespray/inventory/cluster/artifacts/admin.conf ~/.kube/config
 sudo chown ubuntu:ubuntu ~/.kube/config
 
-echo "source <(kubectl completion bash)" >> ~/.bashrc
-
 echo "⛑ Installing helm"
 wget https://get.helm.sh/helm-v2.13.1-linux-amd64.tar.gz
 tar -zxvf helm-v2.13.1-linux-amd64.tar.gz
@@ -54,3 +52,8 @@ sudo mv linux-amd64/helm /usr/local/bin/helm
 rm -f helm-v2.13.1-linux-amd64.tar.gz linux-amd64
 helm init --client-only
 
+echo "🚸 adding tools"
+echo "source <(kubectl completion bash)" >> ~/.bashrc
+echo 'export PROJECT_ID=$(curl -s -H "Metadata-Flavor: Google" http://metadata.google.internal/computeMetadata/v1/project/project-id)' >> ~/.bashrc
+cd ~
+git clone https://github.com/ebriand/kubernetes-security-workshop.git

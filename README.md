@@ -198,7 +198,7 @@ Ce déploiement va créer un Pod qui consommera toute la mémoire du noeud
 
 - Lancez `kubectl get nodes -w`
 
-Au bout de quelques minutes vous verrez :
+Au bout de quelques instants vous verrez :
 `node3   NotReady   <none>   15h   v1.15.3`
 
 L'ensemble de la mémoire disponible sur ce noeud a été consommé et il n'est
@@ -287,7 +287,7 @@ Sans NetworkPolicies, tout Pod peut communiquer avec un autre:
 
 ```bash
 kubectl get pods -n app
-kubectl exec -it <anypod> bash
+kubectl exec -n app -it <anypod> bash
 curl frontend
 curl backend
 (printf "PING\r\n";) | nc redis 6379

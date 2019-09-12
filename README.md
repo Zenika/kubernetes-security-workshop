@@ -6,7 +6,7 @@ Le but du workshop est d'apprendre comment sécuriser son cluster kubernetes par
 - [Cloisonner les composants d'un cluster Kubernetes](https://github.com/ebriand/kubernetes-security-workshop#02--cloisonner-les-composants-dun-cluster)
 - [La gestion des droits d'accès à l'API Kubernetes avec le RBAC](https://github.com/ebriand/kubernetes-security-workshop#03--bien-exploiter-le-rbac)
 - [Limiter les privilèges des conteneurs exécutés sur le cluster](https://github.com/ebriand/kubernetes-security-workshop#04--podsecuritypolicy)
-- [La mise à jour d'un cluster suite à une CVE](https://github.com/ebriand/kubernetes-security-workshop#05--comprendre-limportance-des-mises-%C3%A0-jours-suite-%C3%A0-une-cve)
+- [La mise à jour d'un cluster suite à une CVE](https://github.com/ebriand/kubernetes-security-workshop#05--comprendre-limportance-des-mises-%C3%A0-jour-suite-%C3%A0-une-cve)
 - [Détecter des comportements anormaux au run](https://github.com/ebriand/kubernetes-security-workshop#06--d%C3%A9tecter-des-comportements-non-souhait%C3%A9s-au-runtime)
 
 Le workshop commencera d'abord par une présentation générale des différents concepts abordés avant de vous laisser avancer à votre rythme.

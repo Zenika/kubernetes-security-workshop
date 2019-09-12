@@ -344,7 +344,7 @@ authentifiées :
 
 - les requêtes effectuées depuis votre poste utilisent un compte associé à un certificat.
   Vous pouvez le consulter à l'aide de la commande suivante :
-  `grep client-certificate-data .kube/config | awk '{ print $2 }' | base64 -d | openssl x509 -in - -noout -text | grep "Subject:"`
+  `grep client-certificate-data ~/.kube/config | awk '{ print $2 }' | base64 -d | openssl x509 -in - -noout -text | grep "Subject:"`
 - les requêtes effectuées dans le cluster sont réalisées par des
   [ServiceAccount](https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/)
   Pour en savoir plus sur les ServiceAccount vous pouvez également consulter

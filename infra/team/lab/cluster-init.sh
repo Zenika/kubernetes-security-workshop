@@ -52,10 +52,12 @@ tar -zxvf helm-v2.13.1-linux-amd64.tar.gz
 sudo mv linux-amd64/helm /usr/local/bin/helm
 rm -f helm-v2.13.1-linux-amd64.tar.gz linux-amd64
 helm init --client-only
-helm install stable/traefik --namespace kube-system
 
 echo "🚸 adding tools"
 echo "source <(kubectl completion bash)" >> ~/.bashrc
 echo 'export PROJECT_ID=$(curl -s -H "Metadata-Flavor: Google" http://metadata.google.internal/computeMetadata/v1/project/project-id)' >> ~/.bashrc
 cd ~
 git clone https://github.com/ebriand/kubernetes-security-workshop.git
+
+kubectl apply -f https://raw.githubusercontent.com/containous/traefik/v1.7/examples/k8s/traefik-rbac.yaml
+kubectl apply -f https://raw.githubusercontent.com/containous/traefik/v1.7/examples/k8s/traefik-ds.yaml

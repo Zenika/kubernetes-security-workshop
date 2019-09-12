@@ -76,14 +76,16 @@ Une fois l'application démarrée, vous pouvez la requêter normalement pour obt
 ```bash
 # Pour obtenir l'ip des noeuds
 kubectl get nodes -o wide
-# Utiliser une external ip
-curl <node-external-ip>/rails/chybeta
+# Obtenir le port de l'ingress controller
+export INGRESS_PORT=$(kubectl get svc -n kube-system traefik-ingress-service -o jsonpath={.spec.ports[0].nodePort})
+# Utiliser une ip d'un node
+curl 10.132.0.22:$INGRESS_PORT/rails/chybeta
 ```
 
 Mais avec la faille présente dans cette version de rails, nous pouvons facilement récupérer n'importe quel fichier du conteneur !
 
 ```bash
-curl <node-external-ip>/rails/chybeta -H 'Accept: ../../../../../../../../../../etc/shadow{{'
+curl 10.132.0.22:$INGRESS_PORT/rails/chybeta -H 'Accept: ../../../../../../../../../../etc/shadow{{'
 ```
 
 Vous pouvez retrouver une explication de la faille : <https://chybeta.github.io/2019/03/16/Analysis-for%E3%80%90CVE-2019-5418%E3%80%91File-Content-Disclosure-on-Rails/>
@@ -119,13 +121,13 @@ eu.gcr.io/$PROJECT_ID/rails-with-cve:2
 Une fois la nouvelle version de l'application déployée, le curl précédent ne fonctionne plus pour récupérer `/etc/shadow` :
 
 ```bash
-curl <node-external-ip>/rails/chybeta -H 'Accept: ../../../../../../../../../../etc/shadow{{'
+curl 10.132.0.22:$INGRESS_PORT/rails/chybeta -H 'Accept: ../../../../../../../../../../etc/shadow{{'
 ```
 
 Mais on peut toujours requêter d'autres fichiers :
 
 ```bash
-curl <node-external-ip>/rails/chybeta -H 'Accept: ../../../../../../../../../../demo/Gemfile{{'
+curl 10.132.0.22:$INGRESS_PORT/rails/chybeta -H 'Accept: ../../../../../../../../../../demo/Gemfile{{'
 ```
 
 À noter que cette pratique permet de mitiger d'éventuelles autres failles qui n'auraient pas encore de correctifs.
@@ -143,7 +145,7 @@ eu.gcr.io/$PROJECT_ID/rails-without-cve:1
 Une fois la nouvelle version de l'application déployée, le curl précédent ne fonctionne plus pour récupérer des fichiers du conteneur indépendamment de leur propriétaire :
 
 ```bash
-curl <node-external-ip>/rails/chybeta -H 'Accept: ../../../../../../../../../../demo/Gemfile{{'
+curl 10.132.0.22:$INGRESS_PORT/rails/chybeta -H 'Accept: ../../../../../../../../../../demo/Gemfile{{'
 ```
 
 Une fois le test effectué, supprimer le déploiement.

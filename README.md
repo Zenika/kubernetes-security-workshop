@@ -183,7 +183,7 @@ Et relancer le noeud afin de le réparer (il doit repasser en Ready) :
 
 Avec Kubernetes, comme avec Docker, il est possible de définir des limites
 de ressources affectées aux conteneurs. Pour plus de renseignements sur ce
-mécanisme, vous pouvez consulter la docupmentation officielle [ici](https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/).
+mécanisme, vous pouvez consulter la documentation officielle [ici](https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/).
 
 Néanmoins, ce mécanisme seule ne suffit pas. En effet il est toujours possible
 de créer des Pods sans déclarer les `limits` associées.

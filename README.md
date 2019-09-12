@@ -2,7 +2,7 @@
 
 Le but du workshop est d'apprendre comment sécuriser son cluster kubernetes par la pratique. Nous allons aborder les sujets suivant :
 
-- [Les bonnes pratiques de sécurité des images de conteneur](https://github.com/ebriand/kubernetes-security-workshop#construire-des-images-de-conteneurs-en-appliquant-les-bonnes-pratiques-de-s%C3%A9curit%C3%A9)
+- [Les bonnes pratiques de sécurité des images de conteneur](https://github.com/ebriand/kubernetes-security-workshop#01--construire-des-images-de-conteneurs-en-appliquant-les-bonnes-pratiques-de-s%C3%A9curit%C3%A9)
 - [Cloisonner les composants d'un cluster Kubernetes](https://github.com/ebriand/kubernetes-security-workshop#02--cloisonner-les-composants-dun-cluster)
 - [La gestion des droits d'accès à l'API Kubernetes avec le RBAC](https://github.com/ebriand/kubernetes-security-workshop#03--bien-exploiter-le-rbac)
 - [Limiter les privilèges des conteneurs exécutés sur le cluster](https://github.com/ebriand/kubernetes-security-workshop#04--podsecuritypolicy)
@@ -21,6 +21,8 @@ Au début du workshop, nous vous avons donné les informations pour vous connect
 ssh ubuntu@<host>
 ```
 
+Entrez le mot de passe fourni au début du workshop.
+
 Vous avez les 4 machines à disposition :
 ![Lab infrastructure](images/lab-infrastructure.png)
 
@@ -29,32 +31,39 @@ Vous avez les 4 machines à disposition :
   - Les autres machines sont accessibles directement via `ssh <hostname>`.
     Exemple: `ssh controller`
   - L'énoncé du workshop et les ressources sont déployées dans `/home/ubuntu/kubernetes-security-workshop` via un clone du repository
+  - Dans chacune des étapes, vous retrouverez un sous répertoire `solution` si vous avez besoin de vous débloquer.
 - Le `controller`, control-plane du cluster Kubernetes
 - `worker-0` et `worker-1`, 2 workers du cluster Kubernetes
 
-## Construire des images de conteneurs en appliquant les bonnes pratiques de sécurité
+## 01 : Construire des images de conteneurs en appliquant les bonnes pratiques de sécurité
 
 La sécurité d'un cluster Kubernetes commence par la sécurité des applications. Nous allons illustrer comment sécuriser une application vulnérable à une faille publiquement connue. L'exemple utilisé ici est une faille de rails publiée au début de 2019 (<https://nvd.nist.gov/vuln/detail/CVE-2019-5418>)
 
 ### Construction et déploiement
 
-Nous vous fournissons déjà l'application bootstrapée, le Dockerfile et les descripteurs Kubernetes pour déployer l'application.
+Nous vous fournissons déjà l'application bootstrapée, le Dockerfile et les descripteurs Kubernetes pour déployer l'application. Les fichiers sont dans le répertoire `/home/ubuntu/kubernetes-security-workshop/01-docker-images`
 
 Les commandes à lancer :
 
-Construction de l'image :
+Construire l'image :
 
 ```bash
 docker image build -t eu.gcr.io/$PROJECT_ID/rails-with-cve:1 .
 ```
 
-Publication de l'image :
+Publier l'image :
 
 ```bash
 docker image push eu.gcr.io/$PROJECT_ID/rails-with-cve:1
 ```
 
-Déploiement de l'image :
+Corriger le nom de l'image dans le fichier de deploiement `k8s/01_deployment.yaml`, remplacer PROJECT_ID par la valeur donnée par:
+
+```bash
+echo $PROJECT_ID
+```
+
+Deployer l'application dans Kubernetes :
 
 ```bash
 kubectl apply -f k8s

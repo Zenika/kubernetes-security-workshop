@@ -228,7 +228,7 @@ En vous inspirant de la
 [documentation](https://kubernetes.io/docs/concepts/policy/limit-range/),
 créez une `LimitRange` afin de s'assurer que lorsqu'un Pod est créé il ne
 puisse pas prendre toutes les ressources disponibles.
-Positionnez une valeur par défaut à `memory: "512Mi"` et `cpu: "10m"` pour la limite.
+Positionnez une valeur par défaut à `memory: "512Mi"` et `cpu: "100m"` pour la limite.
 
 Recréez le Pod avec la commande précédente, et vérifiez que cette fois ci il est
 supprimé lorsqu'il occupe trop de ressources.

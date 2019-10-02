@@ -27,4 +27,4 @@ spec:
       containers:
       - image:  vish/stress
         name:  exhauster
-        args: ["-mem-total", "3.5Gi", "-mem-alloc-size", "1Mi", "-mem-alloc-sleep", "10ms"]
+        args: ["-mem-total", "3.5Gi", "-mem-alloc-size", "100Mi", "-mem-alloc-sleep", "10ms"]

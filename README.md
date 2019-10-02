@@ -5,9 +5,9 @@ Le but du workshop est d'apprendre comment sécuriser son cluster Kubernetes par
 - [Les bonnes pratiques de sécurité des images de conteneur](https://github.com/ebriand/kubernetes-security-workshop#01--construire-des-images-de-conteneurs-en-appliquant-les-bonnes-pratiques-de-s%C3%A9curit%C3%A9)
 - [Cloisonner les composants d'un cluster Kubernetes](https://github.com/ebriand/kubernetes-security-workshop#02--cloisonner-les-composants-dun-cluster)
 - [La gestion des droits d'accès à l'API Kubernetes avec le RBAC](https://github.com/ebriand/kubernetes-security-workshop#03--bien-exploiter-le-rbac)
-- [Limiter les privilèges des conteneurs exécutés sur le cluster](https://github.com/ebriand/kubernetes-security-workshop#04--podsecuritypolicy)
-- [La mise à jour d'un cluster suite à une CVE](https://github.com/ebriand/kubernetes-security-workshop#05--comprendre-limportance-des-mises-%C3%A0-jour-suite-%C3%A0-une-cve)
-- [Détecter des comportements anormaux au run](https://github.com/ebriand/kubernetes-security-workshop#06--d%C3%A9tecter-des-comportements-non-souhait%C3%A9s-au-runtime)
+- [La mise à jour d'un cluster suite à une CVE](https://github.com/ebriand/kubernetes-security-workshop#04--comprendre-limportance-des-mises-%C3%A0-jour-suite-%C3%A0-une-cve)
+- [Détecter des comportements anormaux au run](https://github.com/ebriand/kubernetes-security-workshop#05--d%C3%A9tecter-des-comportements-non-souhait%C3%A9s-au-runtime)
+- [Limiter les privilèges des conteneurs exécutés sur le cluster](https://github.com/ebriand/kubernetes-security-workshop#06--podsecuritypolicy)
 
 Le workshop commencera d'abord par une présentation générale des différents concepts abordés avant de vous laisser avancer à votre rythme.
 
@@ -454,7 +454,81 @@ du cluster du point de vue de la sécurité :
 
 - LimitRange, Quotas, PodSecurityPolicy, Role, RoleBinding, ClusterRole, ...
 
-## 04 : PodSecurityPolicy
+## 04 : Comprendre l’importance des mises à jour suite à une CVE
+
+Afin de s'assurer que le Cluster Kubernetes déployé ne comporte pas de failles
+liées à des erreurs de configuration ou des
+[CVE](https://fr.wikipedia.org/wiki/Common_Vulnerabilities_and_Exposures), il
+existe des outils permettant de le scanner.
+
+L'outil que nous allons mettre en oeuvre ici est
+[kube-hunter](https://github.com/aquasecurity/kube-hunter)
+d'[Aqua Security](https://www.aquasec.com/).
+
+Exemple de résultat :
+
+```txt
+Vulnerabilities
++------------------+----------------------+----------------------+----------------------+----------+
+| LOCATION         | CATEGORY             | VULNERABILITY        | DESCRIPTION          | EVIDENCE |
++------------------+----------------------+----------------------+----------------------+----------+
+| 10.132.0.21:6443 | Information          | K8s Version          | The kubernetes       | v1.15.3  |
+|                  | Disclosure           | Disclosure           | version could be     |          |
+|                  |                      |                      | obtained from the    |          |
+|                  |                      |                      | /version endpoint    |          |
++------------------+----------------------+----------------------+----------------------+----------+
+```
+
+Cet outil peut fonctionner de 2 manières :
+
+- Depuis l'extérieur, en utilisant une image Docker :
+  `docker container run -it --rm aquasec/kube-hunter --remote 10.132.0.21`
+
+Vous pouvez alors consulter directement les résultats.
+Il est également possible de scanner tout un range d'adresses réseau pour
+trouver tous les composants susceptibles d'être en écoute :
+`docker container run -it --rm aquasec/kube-hunter --cidr 10.132.0.0/24`
+
+- Depuis l'intérieur du cluster, sous forme de Job Kubernetes, voir
+  `04-scan-cluster/kube-hunter-job.yaml`
+
+Dans ce cas là, vous pouvez consulter l'état du Job avec la commande :
+`kubectl describe job kube-hunter`
+Et en consulter les logs avec la commande :
+`kubectl logs <pod name>`
+
+- Quels sont les problèmes détectés depuis l'extérieur ?
+- Sauriez-vous les résoudre ?
+
+Pour information, lorsqu'une requête est faite sans authentification, elle est
+associée au groupe `system:unauthenticated`.
+
+## 05 : détecter des comportements non souhaités au runtime
+
+Dans les parties précédentes, nous avons vu comment configurer un cluster pour pouvoir mitiger des manipulations accidentelles ou volontaires qui pourraient porter atteinte à son intégrité.
+
+Mais comment détecter un comportement lorsque le cluster fonctionne ? Nous allons utiliser un outil de détection d'intrusion et de comportement anormal.
+[Falco](https://falco.org/) est un outils de la CNCF qui permet de faire cela.
+
+Pour l'installer:
+
+```bash
+helm install --name falco stable/falco
+```
+
+Une fois installé, Falco va auditer en permanence votre cluster. De base un ensemble de règles sont activées pour surveiller le comportement de votre cluster.
+
+Les règles par défaut se trouvent ici : <https://github.com/falcosecurity/falco/blob/dev/rules/falco_rules.yaml>
+
+- Trouver la règle par défaut concernant le spawn de terminal
+- Instancier un terminal dans un pod
+- Regarder les logs de falco pour trouver l'événement déclenché
+- Déclencher un événement de niveau ERROR
+
+Falco ne fait que de l'audit. Une fois cet outil mis en place, on peut le configurer pour publier ses événements en format JSON. En envoyant ces événements dans une queue et en ayant une fonction qui réagit à ces événements, nous pouvons déclencher une action.
+Par exemple: effacer un pod si un shell est ouvert. Vous pouvez retrouver un exemple de mise en place : <https://github.com/falcosecurity/kubernetes-response-engine>
+
+## 06 : PodSecurityPolicy (Optionnel)
 
 Lors de la première étape, nous avons vu qu'il n'était pas souhaitable de
 laisser les utilisateurs lancer des conteneurs en tant qu'utilisateur `root`.
@@ -539,8 +613,8 @@ le service account par défaut du Namespace `kube-system` à l'utiliser.
 En effet, il s'agit de l'espace du cluster réservé au déploiement des
 conteneurs utilisés pour l'administration du cluter.
 
-- `kubectl apply -f 04-psp/kube-system-psp.yaml`
-- `kubectl apply -f 04-psp/default-psp.yaml`
+- `kubectl apply -f 06-psp-optional/kube-system-psp.yaml`
+- `kubectl apply -f 06-psp-optional/default-psp.yaml`
 
 Connectez-vous en ssh au serveur qui héberge le control-plane du cluster.
 
@@ -582,76 +656,3 @@ Une fois ces tests réalisés :
 - Supprimez le déploiement
 - Désactivez l'admission plugin `PodSecurityPolicy`
 
-## 05 : Comprendre l’importance des mises à jour suite à une CVE
-
-Afin de s'assurer que le Cluster Kubernetes déployé ne comporte pas de failles
-liées à des erreurs de configuration ou des
-[CVE](https://fr.wikipedia.org/wiki/Common_Vulnerabilities_and_Exposures), il
-existe des outils permettant de le scanner.
-
-L'outil que nous allons mettre en oeuvre ici est
-[kube-hunter](https://github.com/aquasecurity/kube-hunter)
-d'[Aqua Security](https://www.aquasec.com/).
-
-Exemple de résultat :
-
-```txt
-Vulnerabilities
-+------------------+----------------------+----------------------+----------------------+----------+
-| LOCATION         | CATEGORY             | VULNERABILITY        | DESCRIPTION          | EVIDENCE |
-+------------------+----------------------+----------------------+----------------------+----------+
-| 10.132.0.21:6443 | Information          | K8s Version          | The kubernetes       | v1.15.3  |
-|                  | Disclosure           | Disclosure           | version could be     |          |
-|                  |                      |                      | obtained from the    |          |
-|                  |                      |                      | /version endpoint    |          |
-+------------------+----------------------+----------------------+----------------------+----------+
-```
-
-Cet outil peut fonctionner de 2 manières :
-
-- Depuis l'extérieur, en utilisant une image Docker :
-  `docker container run -it --rm aquasec/kube-hunter --remote 10.132.0.21`
-
-Vous pouvez alors consulter directement les résultats.
-Il est également possible de scanner tout un range d'adresses réseau pour
-trouver tous les composants susceptibles d'être en écoute :
-`docker container run -it --rm aquasec/kube-hunter --cidr 10.132.0.0/24`
-
-- Depuis l'intérieur du cluster, sous forme de Job Kubernetes, voir
-  `06-scan-cluster/kube-hunter-job.yaml`
-
-Dans ce cas là, vous pouvez consulter l'état du Job avec la commande :
-`kubectl describe job kube-hunter`
-Et en consulter les logs avec la commande :
-`kubectl logs <pod name>`
-
-- Quels sont les problèmes détectés depuis l'extérieur ?
-- Sauriez-vous les résoudre ?
-
-Pour information, lorsqu'une requête est faite sans authentification, elle est
-associée au groupe `system:unauthenticated`.
-
-## 06 : détecter des comportements non souhaités au runtime
-
-Dans les parties précédentes, nous avons vu comment configurer un cluster pour pouvoir mitiger des manipulations accidentelles ou volontaires qui pourraient porter atteinte à son intégrité.
-
-Mais comment détecter un comportement lorsque le cluster fonctionne ? Nous allons utiliser un outil de détection d'intrusion et de comportement anormal.
-[Falco](https://falco.org/) est un outils de la CNCF qui permet de faire cela.
-
-Pour l'installer:
-
-```bash
-helm install --name falco stable/falco
-```
-
-Une fois installé, Falco va auditer en permanence votre cluster. De base un ensemble de règles sont activées pour surveiller le comportement de votre cluster.
-
-Les règles par défaut se trouvent ici : <https://github.com/falcosecurity/falco/blob/dev/rules/falco_rules.yaml>
-
-- Trouver la règle par défaut concernant le spawn de terminal
-- Instancier un terminal dans un pod
-- Regarder les logs de falco pour trouver l'événement déclenché
-- Déclencher un événement de niveau ERROR
-
-Falco ne fait que de l'audit. Une fois cet outil mis en place, on peut le configurer pour publier ses événements en format JSON. En envoyant ces événements dans une queue et en ayant une fonction qui réagit à ces événements, nous pouvons déclencher une action.
-Par exemple: effacer un pod si un shell est ouvert. Vous pouvez retrouver un exemple de mise en place : <https://github.com/falcosecurity/kubernetes-response-engine>

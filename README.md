@@ -140,7 +140,8 @@ curl 10.132.0.22:$INGRESS_PORT/rails/chybeta -H 'Accept: ../../../../../../../..
 
 ### 01.04 : Mise à jour des dépendances
 
-La seconde étape va être de mettre à jour la version de rails qui contient le fix de la CVE. Mettre à jour le fichier Gemfile avec une version fixée de rails.
+La seconde étape va être de mettre à jour la version de rails qui contient le fix de la CVE. Mettre à jour le fichier `Gemfile` avec une version fixée de rails.
+Supprimer le fichier `Gemfile.lock` afin de forcer le recalcul des dépendances.
 
 Construire, publier et redéployer l'image avec le tag :
 

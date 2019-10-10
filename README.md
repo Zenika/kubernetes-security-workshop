@@ -237,18 +237,10 @@ supprimé lorsqu'il occupe trop de ressources.
 Malheureusement, même ainsi, il est toujours possible d'occuper toutes les
 ressources du cluster en augmentant le nombre d'instances du Pod qui tournent
 en même temps.
-Faites le test en lançant la commande (définissez une valeur suffisament élevée
-pour occuper toute la mémoire) :  
-`kubectl scale --replicas=20 deploy/exhauster`
-
-À nouveau, lancez `kubectl get nodes -w`
-
-Et attendez quelques minutes de voir :
-`node3   NotReady   <none>   15h   v1.15.3`
-
-Il est également possible que le noeud reste disponible mais que les Pods
-restent en Pending. L'effet est le même pour les équipes qui partageraient
-ce cluster : les ressources ne sont plus disponibles.
+Dans ce cas, le noeud reste disponible mais les Pods restent en Pending. 
+Le cluster ne dispose plus des ressources nécessaires pour créer de nouveaux
+Pods.
+L'effet est le même pour les équipes qui partageraient ce cluster : les ressources ne sont plus disponibles.
 
 Nous allons voir comment empêcher la création d'un trop grand nombre de Pods.
 Mais avant tout, nous allons supprimer cette application.
@@ -261,14 +253,23 @@ Et relancer le noeud afin de le réparer (il doit repasser en Ready) :
 
 En vous inspirant des exemples disponibles
 [ici](https://kubernetes.io/docs/tasks/administer-cluster/manage-resources/quota-memory-cpu-namespace/),
-créez les Quotas afin d'empêcher que la multiplication des instances
+créez un Quota afin d'empêcher que la multiplication des instances
 d'`exhauster` n'occupent toutes les ressources.
+Positionnez les valeurs suivantes pour le Quota créé :
+```yaml
+    limits.cpu: "500m"
+    limits.memory: 1Gi
+```
 
 Tester votre solution en appliquant à nouveau le déploiement :
 `kubectl apply -f 02-partition/01-quota/malicious-deployment.yml`
 
 Et en multipliant le nombre d'instances désirées :
 `kubectl scale --replicas=20 deploy/exhauster`
+
+Les Pods du Deployment `exhauster` restent à l'état `Pending`, mais les
+ressources du cluster restent disponibles pour les utilisateurs des autres
+Namespaces.
 
 ### 02.02 : NetworkPolicy
 

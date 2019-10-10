@@ -1,4 +1,4 @@
-FROM ruby:2.5.1
+FROM pyaillet/ruby-deps:1.0
 
 RUN apt update && apt install -y nodejs=4.8.2~dfsg-1
 

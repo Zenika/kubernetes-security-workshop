@@ -319,7 +319,6 @@ Créez les NetworkPolicies suivantes:
 
 - Autoriser la communication vers le Pod backend seulement depuis le Pod frontend
 - Refuser toute communication vers le Pod frontend
-- Refuser la communication depuis le Pod frontend vers internet
 
 Pour vous aider :
 

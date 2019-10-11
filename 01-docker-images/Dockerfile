@@ -1,4 +1,4 @@
-FROM pyaillet/ruby-deps:1.0
+FROM eu.gcr.io/kubernetes-security-workshop/ruby-deps:1.0
 
 RUN apt update && apt install -y nodejs=4.8.2~dfsg-1
 

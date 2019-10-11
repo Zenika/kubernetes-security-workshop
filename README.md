@@ -142,6 +142,7 @@ curl 10.132.0.22:$INGRESS_PORT/rails/chybeta -H 'Accept: ../../../../../../../..
 
 La seconde étape va être de mettre à jour la version de rails qui contient le fix de la CVE. Mettre à jour le fichier `Gemfile` avec une version fixée de rails.
 Supprimer le fichier `Gemfile.lock` afin de forcer le recalcul des dépendances.
+Afin d'accélérer le téléchargement des dépendances, pensez à remplacer le `FROM` par `eu.gcr.io/kubernetes-security-workshop/ruby-deps:1.1`
 
 Construire, publier et redéployer l'image avec le tag :
 

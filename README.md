@@ -13,7 +13,7 @@ Le workshop commencera d'abord par une présentation générale des différents 
 
 Pour pouvoir continuer à avancer même si une étape est problématique, nous vous fournissons les solutions de chacune des étapes.
 
-## Connexion à l'espace de travail
+## 00 : Connexion à l'espace de travail
 
 Au début du workshop, nous vous avons donné les informations pour vous connecter. La commande à lancer pour se connecter :
 
@@ -40,6 +40,19 @@ En interne du cluster les noeuds ont un nommage un peu différent :
 - `controller` : `node1`
 - `worker-0` : `node2`
 - `worker-1` : `node3`
+
+Vérifier que tout fonctionne : 
+
+- Verifier que Docker est ok :
+```bash
+docker version
+```
+doit renvoyer la version du client et du serveur
+- Vérifier que Kubernetes est ok : 
+```bash
+kubernetes get nodes
+```
+doit renvoyer la liste des noeuds du cluster
 
 ## 01 : Construire des images de conteneurs en appliquant les bonnes pratiques de sécurité
 

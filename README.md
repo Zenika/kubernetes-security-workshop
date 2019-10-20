@@ -348,7 +348,6 @@ Pour tester que les NetworkPolicies sont correctes:
 
 - Dans le Pod redis : `curl frontend`
 - Dans le Pod frontend : `(printf "PING\r\n";) | nc redis 6379`
-- Dans le Pod frontend : `curl google.fr`
 
 Grâce aux NetworkPolicies, vous pouvez donc :
 

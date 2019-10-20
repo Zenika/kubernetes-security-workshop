@@ -18,8 +18,13 @@ Pour pouvoir continuer à avancer même si une étape est problématique, nous v
 Au début du workshop, nous vous avons donné les informations pour vous connecter. La commande à lancer pour se connecter :
 
 ```bash
-ssh ubuntu@<host>
+ssh -o PubkeyAuthentication=no ubuntu@<host>
 ```
+
+Il est préférable de préciser le `-o PubkeyAuthentication=no` pour forcer
+l'authentification par mot de passe et éviter d'être banni de la VM suite à un
+trop grand nombre d'authentifications échoués avec une clé publique non
+reconnue. Les VMs sont protégées par [SSHGuard](https://www.sshguard.net/).
 
 Entrez le mot de passe fourni au début du workshop.
 

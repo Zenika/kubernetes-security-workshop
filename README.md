@@ -55,7 +55,7 @@ docker version
 doit renvoyer la version du client et du serveur
 - Vérifier que Kubernetes est ok : 
 ```bash
-kubernetes get nodes
+kubectl get nodes
 ```
 doit renvoyer la liste des noeuds du cluster
 

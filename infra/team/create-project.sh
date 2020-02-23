@@ -1,4 +1,6 @@
-#!/bin/sh
+#!/usr/bin/env sh
+
+set -e
 
 source .env
 
@@ -23,7 +25,7 @@ gcloud projects add-iam-policy-binding $PROJECT \
   --role roles/owner
 
 gcloud projects add-iam-policy-binding $PROJECT \
-  --member serviceAccount:terraform@kubernetes-security-workshop.iam.gserviceaccount.com \
+  --member serviceAccount:terraform@${TF_PROJECT}.iam.gserviceaccount.com \
   --role roles/owner
 
 gcloud services enable compute.googleapis.com --project $PROJECT
